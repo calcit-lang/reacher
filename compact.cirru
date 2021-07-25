@@ -1,54 +1,12 @@
 
-{} (:package |app)
-  :configs $ {} (:init-fn |app.main/main!) (:reload-fn |app.main/reload!)
-    :modules $ [] |respo.calcit/compact.cirru |lilac/compact.cirru |memof/compact.cirru |respo-ui.calcit/compact.cirru |respo-markdown.calcit/compact.cirru |reel.calcit/compact.cirru
+{} (:package |reacher)
+  :configs $ {} (:init-fn |reacher.app.main/main!) (:reload-fn |reacher.app.main/reload!)
+    :modules $ [] |respo.calcit/ |lilac/ |memof/ |respo-ui.calcit/
     :version |0.0.1
   :files $ {}
-    |app.comp.container $ {}
+    |reacher.app.updater $ {}
       :ns $ quote
-        ns app.comp.container $ :require (respo-ui.core :as ui)
-          respo.core :refer $ defcomp defeffect <> >> div button textarea span input
-          respo.comp.space :refer $ =<
-          reel.comp.reel :refer $ comp-reel
-          respo-md.comp.md :refer $ comp-md
-          app.config :refer $ dev?
-      :defs $ {}
-        |comp-container $ quote
-          defcomp comp-container (reel)
-            let
-                store $ :store reel
-                states $ :states store
-                cursor $ either (:cursor states) ([])
-                state $ either (:data states)
-                  {} $ :content "\""
-              div
-                {} $ :style (merge ui/global ui/row)
-                textarea $ {}
-                  :value $ :content state
-                  :placeholder "\"Content"
-                  :style $ merge ui/expand ui/textarea
-                    {} $ :height 320
-                  :on-input $ fn (e d!)
-                    d! cursor $ assoc state :content (:value e)
-                =< 8 nil
-                div
-                  {} $ :style ui/expand
-                  comp-md "|This is some content with `code`"
-                  =< |8px nil
-                  button $ {} (:style ui/button) (:inner-text "\"Run")
-                    :on-click $ fn (e d!)
-                      println $ :content state
-                when dev? $ comp-reel (>> states :reel) reel ({})
-    |app.schema $ {}
-      :ns $ quote (ns app.schema)
-      :defs $ {}
-        |store $ quote
-          def store $ {}
-            :states $ {}
-              :cursor $ []
-    |app.updater $ {}
-      :ns $ quote
-        ns app.updater $ :require
+        ns reacher.app.updater $ :require
           respo.cursor :refer $ update-states
       :defs $ {}
         |updater $ quote
@@ -57,35 +15,39 @@
               :states $ update-states store data
               :hydrate-storage data
               op store
-    |app.main $ {}
+    |reacher.app.config $ {}
+      :ns $ quote (ns reacher.app.config)
+      :defs $ {}
+        |dev? $ quote
+          def dev? $ = "\"dev" (get-env "\"mode")
+        |site $ quote
+          def site $ {} (:storage-key "\"workflow")
+    |reacher.app.schema $ {}
+      :ns $ quote (ns reacher.app.schema)
+      :defs $ {}
+    |reacher.app.main $ {}
       :ns $ quote
-        ns app.main $ :require
-          respo.core :refer $ render! clear-cache!
-          app.comp.container :refer $ comp-container
-          app.updater :refer $ updater
-          app.schema :as schema
-          reel.util :refer $ listen-devtools!
-          reel.core :refer $ reel-updater refresh-reel
-          reel.schema :as reel-schema
-          app.config :as config
+        ns reacher.app.main $ :require
+          reacher.app.comp.container :refer $ comp-container
+          reacher.app.updater :refer $ updater
+          reacher.app.schema :as schema
+          reacher.app.config :as config
           "\"./calcit.build-errors" :default build-errors
           "\"bottom-tip" :default hud!
+          "\"react-dom" :as ReactDOM
+          "\"react" :as React
       :defs $ {}
         |render-app! $ quote
-          defn render-app! () $ render! mount-target (comp-container @*reel) dispatch!
+          defn render-app! () $ ReactDOM/render (React/createElement comp-container @*store) mount-target
         |persist-storage! $ quote
-          defn persist-storage! () $ .!setItem js/localStorage (:storage-key config/site)
-            format-cirru-edn $ :store @*reel
+          defn persist-storage! () $ .!setItem js/localStorage (:storage-key config/site) (format-cirru-edn @*store)
         |mount-target $ quote
           def mount-target $ .!querySelector js/document |.app
-        |*reel $ quote
-          defatom *reel $ -> reel-schema/reel (assoc :base schema/store) (assoc :store schema/store)
         |main! $ quote
           defn main! ()
             println "\"Running mode:" $ if config/dev? "\"dev" "\"release"
             render-app!
-            add-watch *reel :changes $ fn (reel prev) (render-app!)
-            listen-devtools! |k dispatch!
+            add-watch *store :changes $ fn (s prev) (render-app!)
             .!addEventListener js/window |beforeunload $ fn (event) (persist-storage!)
             repeat! 60 persist-storage!
             let
@@ -93,17 +55,19 @@
               when (some? raw)
                 dispatch! :hydrate-storage $ parse-cirru-edn raw
             println "|App started."
+        |*store $ quote
+          defatom *store $ {}
         |dispatch! $ quote
           defn dispatch! (op op-data)
             when
               and config/dev? $ not= op :states
               println "\"Dispatch:" op
-            reset! *reel $ reel-updater updater @*reel op op-data
+            reset! *store $ updater @*store op op-data nil nil
         |reload! $ quote
           defn reload! () $ if (nil? build-errors)
-            do (remove-watch *reel :changes) (clear-cache!)
-              add-watch *reel :changes $ fn (reel prev) (render-app!)
-              reset! *reel $ refresh-reel @*reel schema/store updater
+            do (remove-watch *store :changes)
+              add-watch *store :changes $ fn (s prev) (render-app!)
+              render-app!
               hud! "\"ok~" "\"Ok"
             hud! "\"error" build-errors
         |repeat! $ quote
@@ -112,10 +76,79 @@
               fn () (cb)
                 repeat! (* 1000 duration) cb
               * 1000 duration
-    |app.config $ {}
-      :ns $ quote (ns app.config)
+    |reacher.app.comp.container $ {}
+      :ns $ quote
+        ns reacher.app.comp.container $ :require (respo-ui.core :as ui)
+          reacher.app.config :refer $ dev?
+          reacher.core :refer $ defcomp div =< textarea span input button
+          "\"react" :as React
       :defs $ {}
-        |dev? $ quote
-          def dev? $ = "\"dev" (get-env "\"mode")
-        |site $ quote
-          def site $ {} (:storage-key "\"workflow")
+        |comp-container $ quote
+          defn comp-container (? props children)
+            let
+                a $ React/useState "\""
+                draft $ aget a 0
+                set-draft! $ aget a 1
+              div
+                {} $ :style (merge ui/global ui/row)
+                textarea $ {} (:value draft) (:placeholder "\"Content")
+                  :style $ merge ui/expand ui/textarea
+                    {} $ :height 320
+                  :on-input $ fn (event)
+                    set-draft! $ -> event .-target .-value
+                =< 8 nil
+                div
+                  {} $ :style ui/expand
+                  =< |8px nil
+                  button
+                    {} (:style ui/button)
+                      :on-click $ fn (event) (println draft)
+                    , "\"Run"
+    |reacher.core $ {}
+      :ns $ quote
+        ns reacher.core $ :require ("\"react" :as React)
+      :defs $ {}
+        |map-strip-keyword $ quote
+          defn map-strip-keyword (xs)
+            map xs $ fn (x)
+              if (keyword? x) (turn-string x) x
+        |div $ quote
+          defn div (props & children) (create-element "\"div" props children)
+        |span $ quote
+          defn span (props & children) (create-element "\"span" props children)
+        |create-element $ quote
+          defn create-element (tag props children)
+            React/createElement (turn-string tag) (transform-props props) & children
+        |textarea $ quote
+          defn textarea (props & children) (create-element "\"textarea" props children)
+        |input $ quote
+          defn input (props & children) (create-element "\"input" props children)
+        |=< $ quote
+          defn =< (w h)
+            if (number? w)
+              React/createElement "\"div" $ js-object
+                "\"style" $ js-object ("\"width" w)
+              React/createElement "\"div" $ js-object
+                "\"style" $ js-object ("\"height" h)
+        |dashed->camel $ quote
+          defn dashed->camel (x)
+            .!replace x dashed-letter-pattern $ fn (cc pos prop)
+              .!toUpperCase $ aget cc 1
+        |transform-props $ quote
+          defn transform-props (props)
+            if (nil? props) (&js-object)
+              -> props
+                map-kv $ fn (k v)
+                  if (= :style k)
+                    [] "\"style" $ transform-props (:style props)
+                    []
+                      dashed->camel $ turn-string k
+                      cond
+                          fn? v
+                          , v
+                        true $ turn-string v
+                to-js-data
+        |dashed-letter-pattern $ quote
+          def dashed-letter-pattern $ new js/RegExp "\"-[a-z]" "\"g"
+        |button $ quote
+          defn button (props & children) (create-element "\"button" props children)
