@@ -1,20 +1,16 @@
 
 {} (:package |reacher)
   :configs $ {} (:init-fn |reacher.app.main/main!) (:reload-fn |reacher.app.main/reload!)
-    :modules $ [] |respo.calcit/ |lilac/ |memof/ |respo-ui.calcit/
+    :modules $ [] |respo-ui.calcit/
     :version |0.0.1
   :files $ {}
     |reacher.app.updater $ {}
       :ns $ quote
         ns reacher.app.updater $ :require
-          respo.cursor :refer $ update-states
       :defs $ {}
         |updater $ quote
           defn updater (store op data op-id op-time)
-            case op
-              :states $ update-states store data
-              :hydrate-storage data
-              op store
+            case-default op store $ :hydrate-storage data
     |reacher.app.config $ {}
       :ns $ quote (ns reacher.app.config)
       :defs $ {}
@@ -46,6 +42,7 @@
         |main! $ quote
           defn main! ()
             println "\"Running mode:" $ if config/dev? "\"dev" "\"release"
+            if config/dev? $ load-console-formatter!
             render-app!
             add-watch *store :changes $ fn (s prev) (render-app!)
             .!addEventListener js/window |beforeunload $ fn (event) (persist-storage!)
@@ -79,6 +76,7 @@
     |reacher.app.comp.container $ {}
       :ns $ quote
         ns reacher.app.comp.container $ :require (respo-ui.core :as ui)
+          respo-ui.core :refer $ hsl
           reacher.app.config :refer $ dev?
           reacher.core :refer $ defcomp div =< textarea span input button
           "\"react" :as React
@@ -108,6 +106,17 @@
       :ns $ quote
         ns reacher.core $ :require ("\"react" :as React)
       :defs $ {}
+        |style->string $ quote
+          defn style->string (styles)
+            -> styles (.to-list)
+              map $ fn (entry)
+                let
+                    k $ first entry
+                    style-name $ turn-string k
+                    v $ w-log
+                      get-style-value (last entry) (dashed->camel style-name)
+                  str style-name |: (escape-html v) |;
+              join-str |
         |map-strip-keyword $ quote
           defn map-strip-keyword (xs)
             map xs $ fn (x)
@@ -123,6 +132,9 @@
           defn textarea (props & children) (create-element "\"textarea" props children)
         |input $ quote
           defn input (props & children) (create-element "\"input" props children)
+        |escape-html $ quote
+          defn escape-html (text)
+            if (nil? text) "\"" $ -> text (.!replace "|\"" |&quot;) (.!replace |< |&lt;) (.!replace |> |&gt;) (.!replace &newline "\"&#13;&#10;")
         |=< $ quote
           defn =< (w h)
             if (number? w)
@@ -130,17 +142,35 @@
                 "\"style" $ js-object ("\"width" w)
               React/createElement "\"div" $ js-object
                 "\"style" $ js-object ("\"height" h)
+        |get-style-value $ quote
+          defn get-style-value (x prop)
+            cond
+                string? x
+                , x
+              (keyword? x) (turn-string x)
+              (number? x)
+                if (.!test pattern-non-dimension-props prop) (str x) (str x "\"px")
+              true $ str x
         |dashed->camel $ quote
           defn dashed->camel (x)
             .!replace x dashed-letter-pattern $ fn (cc pos prop)
               .!toUpperCase $ aget cc 1
+        |pattern-non-dimension-props $ quote
+          def pattern-non-dimension-props $ new js/RegExp "\"acit|ex(?:s|g|n|p|$)|rph|grid|ows|mnc|ntw|ine[ch]|zoo|^ord|itera" "\"i"
         |transform-props $ quote
           defn transform-props (props)
             if (nil? props) (&js-object)
               -> props
                 map-kv $ fn (k v)
                   if (= :style k)
-                    [] "\"style" $ transform-props (:style props)
+                    [] "\"style" $ let
+                        s $ :style props
+                      if (nil? s) "\"" $ -> s
+                        map-kv $ fn (k v)
+                          let
+                              prop $ dashed->camel (turn-string k)
+                            [] prop $ get-style-value v prop
+                        to-js-data
                     []
                       dashed->camel $ turn-string k
                       cond
