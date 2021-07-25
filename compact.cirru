@@ -21,6 +21,40 @@
     |reacher.app.schema $ {}
       :ns $ quote (ns reacher.app.schema)
       :defs $ {}
+    |reacher.util.str $ {}
+      :ns $ quote (ns reacher.util.str)
+      :defs $ {}
+        |dashed->camel $ quote
+          defn dashed->camel (x)
+            .!replace x dashed-letter-pattern $ fn (cc pos prop)
+              .!toUpperCase $ aget cc 1
+        |dashed-letter-pattern $ quote
+          def dashed-letter-pattern $ new js/RegExp "\"-[a-z]" "\"g"
+        |escape-html $ quote
+          defn escape-html (text)
+            if (nil? text) "\"" $ -> text (.!replace "|\"" |&quot;) (.!replace |< |&lt;) (.!replace |> |&gt;) (.!replace &newline "\"&#13;&#10;")
+        |pattern-non-dimension-props $ quote
+          def pattern-non-dimension-props $ new js/RegExp "\"acit|ex(?:s|g|n|p|$)|rph|grid|ows|mnc|ntw|ine[ch]|zoo|^ord|itera" "\"i"
+        |style->string $ quote
+          defn style->string (styles)
+            -> styles (.to-list)
+              map $ fn (entry)
+                let
+                    k $ first entry
+                    style-name $ turn-string k
+                    v $ w-log
+                      get-style-value (last entry) (dashed->camel style-name)
+                  str style-name |: (escape-html v) |;
+              join-str |
+        |get-style-value $ quote
+          defn get-style-value (x prop)
+            cond
+                string? x
+                , x
+              (keyword? x) (turn-string x)
+              (number? x)
+                if (.!test pattern-non-dimension-props prop) (str x) (str x "\"px")
+              true $ str x
     |reacher.app.main $ {}
       :ns $ quote
         ns reacher.app.main $ :require
@@ -28,13 +62,12 @@
           reacher.app.updater :refer $ updater
           reacher.app.schema :as schema
           reacher.app.config :as config
+          reacher.core :refer $ render! wrap-comp
           "\"./calcit.build-errors" :default build-errors
           "\"bottom-tip" :default hud!
-          "\"react-dom" :as ReactDOM
-          "\"react" :as React
       :defs $ {}
         |render-app! $ quote
-          defn render-app! () $ ReactDOM/render (React/createElement comp-container @*store) mount-target
+          defn render-app! () $ render! mount-target (wrap-comp comp-container @*store)
         |persist-storage! $ quote
           defn persist-storage! () $ .!setItem js/localStorage (:storage-key config/site) (format-cirru-edn @*store)
         |mount-target $ quote
@@ -78,45 +111,36 @@
         ns reacher.app.comp.container $ :require (respo-ui.core :as ui)
           respo-ui.core :refer $ hsl
           reacher.app.config :refer $ dev?
-          reacher.core :refer $ defcomp div =< textarea span input button
+          reacher.core :refer $ defcomp div =< textarea span input button use-atom
           "\"react" :as React
       :defs $ {}
         |comp-container $ quote
           defn comp-container (? props children)
             let
-                a $ React/useState "\""
-                draft $ aget a 0
-                set-draft! $ aget a 1
+                *draft $ use-atom "\""
               div
                 {} $ :style (merge ui/global ui/row)
-                textarea $ {} (:value draft) (:placeholder "\"Content")
+                textarea $ {}
+                  :value $ .get *draft
+                  :placeholder "\"Content"
                   :style $ merge ui/expand ui/textarea
                     {} $ :height 320
-                  :on-input $ fn (event)
-                    set-draft! $ -> event .-target .-value
+                  :on-change $ fn (event)
+                    .set! *draft $ -> event .-target .-value
                 =< 8 nil
                 div
                   {} $ :style ui/expand
                   =< |8px nil
                   button
                     {} (:style ui/button)
-                      :on-click $ fn (event) (println draft)
+                      :on-click $ fn (event)
+                        println $ .get *draft
                     , "\"Run"
     |reacher.core $ {}
       :ns $ quote
-        ns reacher.core $ :require ("\"react" :as React)
+        ns reacher.core $ :require ("\"react" :as React) ("\"react-dom" :as ReactDOM)
+          reacher.util.str :refer $ get-style-value dashed->camel
       :defs $ {}
-        |style->string $ quote
-          defn style->string (styles)
-            -> styles (.to-list)
-              map $ fn (entry)
-                let
-                    k $ first entry
-                    style-name $ turn-string k
-                    v $ w-log
-                      get-style-value (last entry) (dashed->camel style-name)
-                  str style-name |: (escape-html v) |;
-              join-str |
         |map-strip-keyword $ quote
           defn map-strip-keyword (xs)
             map xs $ fn (x)
@@ -132,9 +156,13 @@
           defn textarea (props & children) (create-element "\"textarea" props children)
         |input $ quote
           defn input (props & children) (create-element "\"input" props children)
-        |escape-html $ quote
-          defn escape-html (text)
-            if (nil? text) "\"" $ -> text (.!replace "|\"" |&quot;) (.!replace |< |&lt;) (.!replace |> |&gt;) (.!replace &newline "\"&#13;&#10;")
+        |use-atom $ quote
+          defn use-atom (v)
+            let
+                xs $ React/useState v
+                s $ aget xs 0
+                s! $ aget xs 1
+              :: %state-ref $ [] s s!
         |=< $ quote
           defn =< (w h)
             if (number? w)
@@ -142,21 +170,18 @@
                 "\"style" $ js-object ("\"width" w)
               React/createElement "\"div" $ js-object
                 "\"style" $ js-object ("\"height" h)
-        |get-style-value $ quote
-          defn get-style-value (x prop)
-            cond
-                string? x
-                , x
-              (keyword? x) (turn-string x)
-              (number? x)
-                if (.!test pattern-non-dimension-props prop) (str x) (str x "\"px")
-              true $ str x
-        |dashed->camel $ quote
-          defn dashed->camel (x)
-            .!replace x dashed-letter-pattern $ fn (cc pos prop)
-              .!toUpperCase $ aget cc 1
-        |pattern-non-dimension-props $ quote
-          def pattern-non-dimension-props $ new js/RegExp "\"acit|ex(?:s|g|n|p|$)|rph|grid|ows|mnc|ntw|ine[ch]|zoo|^ord|itera" "\"i"
+        |wrap-comp $ quote
+          defn wrap-comp (f props & children) (React/createElement f props & children)
+        |use-effect! $ quote
+          defn use-effect! (params f)
+            React/useEffect f $ js-array & params
+        |%state-ref $ quote
+          defrecord! %state-ref
+            :get $ fn (xs)
+              -> xs (nth 1) (nth 0)
+            :set! $ fn (xs v)
+                -> xs (nth 1) (nth 1)
+                , v
         |transform-props $ quote
           defn transform-props (props)
             if (nil? props) (&js-object)
@@ -178,7 +203,7 @@
                           , v
                         true $ turn-string v
                 to-js-data
-        |dashed-letter-pattern $ quote
-          def dashed-letter-pattern $ new js/RegExp "\"-[a-z]" "\"g"
         |button $ quote
           defn button (props & children) (create-element "\"button" props children)
+        |render! $ quote
+          defn render! (target el) (ReactDOM/render el target)
