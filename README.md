@@ -6,7 +6,24 @@ Demo http://repo.calcit-lang.org/reacher/ .
 
 ### Usages
 
-_TODO_
+```cirru
+render! mount-target (wrap-comp C props child)
+```
+
+```cirru
+; "TODO"
+use-effect! ([] :a :b) $ fn ()
+  println |effect
+```
+
+```cirru
+let
+    *r $ use-atom |demo
+  println $ .get *r
+  div $ {}
+    :on-click $ fn (event)
+      .set! *r |another
+```
 
 ### Workflow
 
