@@ -62,12 +62,15 @@
           reacher.app.updater :refer $ updater
           reacher.app.schema :as schema
           reacher.app.config :as config
-          reacher.core :refer $ render! wrap-comp
+          reacher.core :refer $ render! wrap-comp dispatch-provider
           "\"./calcit.build-errors" :default build-errors
           "\"bottom-tip" :default hud!
       :defs $ {}
         |render-app! $ quote
-          defn render-app! () $ render! mount-target (wrap-comp comp-container @*store)
+          defn render-app! () $ render! mount-target
+            wrap-comp dispatch-provider
+              js-object $ "\"value" dispatch!
+              wrap-comp comp-container @*store
         |persist-storage! $ quote
           defn persist-storage! () $ .!setItem js/localStorage (:storage-key config/site) (format-cirru-edn @*store)
         |mount-target $ quote
@@ -111,13 +114,16 @@
         ns reacher.app.comp.container $ :require (respo-ui.core :as ui)
           respo-ui.core :refer $ hsl
           reacher.app.config :refer $ dev?
-          reacher.core :refer $ defcomp div =< textarea span input button use-atom
+          reacher.core :refer $ defcomp div =< textarea span input button use-atom use-dispatch use-effect! re-memo wrap-comp
           "\"react" :as React
       :defs $ {}
         |comp-container $ quote
           defn comp-container (? props children)
             let
                 *draft $ use-atom "\""
+                d! $ use-dispatch
+              use-effect! ([] 1)
+                fn () $ println "\"effect"
               div
                 {} $ :style (merge ui/global ui/row)
                 textarea $ {}
@@ -128,6 +134,7 @@
                   :on-change $ fn (event)
                     .set! *draft $ -> event .-target .-value
                 =< 8 nil
+                wrap-comp memod-comp-task $ js-object
                 div
                   {} $ :style ui/expand
                   =< |8px nil
@@ -135,7 +142,16 @@
                     {} (:style ui/button)
                       :on-click $ fn (event)
                         println $ .get *draft
+                        d! :demo :demo
                     , "\"Run"
+        |comp-task $ quote
+          defn comp-task (? task children)
+            use-effect!
+              [] $ js/Math.random
+              fn () $ println "\"effect"
+            div ({}) "\"TODO"
+        |memod-comp-task $ quote
+          def memod-comp-task $ re-memo comp-task
     |reacher.core $ {}
       :ns $ quote
         ns reacher.core $ :require ("\"react" :as React) ("\"react-dom" :as ReactDOM)
@@ -149,6 +165,17 @@
           defn div (props & children) (create-element "\"div" props children)
         |span $ quote
           defn span (props & children) (create-element "\"span" props children)
+        |props-equal $ quote
+          defn props-equal (prev next)
+            let
+                p-fields $ js/Object.keys prev
+                n-fields $ js/Object.keys next
+              if
+                = (.-length p-fields) (.-length n-fields)
+                .!every p-fields $ fn (k)
+                  and (.includes n-fields k)
+                    = (aget prev k) (aget next k)
+                , false
         |create-element $ quote
           defn create-element (tag props children)
             React/createElement (turn-string tag) (transform-props props) & children
@@ -174,7 +201,15 @@
           defn wrap-comp (f props & children) (React/createElement f props & children)
         |use-effect! $ quote
           defn use-effect! (params f)
-            React/useEffect f $ js-array & params
+            let
+                r* $ React/useRef params
+              if
+                not= params $ .-current r*
+                do $ set! (.-current r*) params
+              React/useEffect f $ js-array & (.-current r*)
+        |context-of-dispatch $ quote
+          def context-of-dispatch $ React/createContext
+            fn (op data) (js/console.warn "\"missing dispatch function" op)
         |%state-ref $ quote
           defrecord! %state-ref
             :get $ fn (xs)
@@ -205,5 +240,11 @@
                 to-js-data
         |button $ quote
           defn button (props & children) (create-element "\"button" props children)
+        |use-dispatch $ quote
+          defn use-dispatch () $ React/useContext context-of-dispatch
+        |re-memo $ quote
+          defn re-memo (c) (React/memo c props-equal)
+        |dispatch-provider $ quote
+          def dispatch-provider $ .-Provider context-of-dispatch
         |render! $ quote
           defn render! (target el) (ReactDOM/render el target)
