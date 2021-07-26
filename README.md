@@ -7,6 +7,15 @@ Demo http://repo.calcit-lang.org/reacher/ .
 ### Usages
 
 ```cirru
+div
+  {} (:style ({}))
+  div ({})
+
+tag* :div
+  {} (:style ({}))
+```
+
+```cirru
 render! mount-target (wrap-comp C props child)
 ```
 

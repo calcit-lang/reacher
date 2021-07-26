@@ -10,7 +10,25 @@
       :defs $ {}
         |updater $ quote
           defn updater (store op data op-id op-time)
-            case-default op store $ :hydrate-storage data
+            case-default op
+              do (println "\"unknown op:" op) store
+              :add-task $ update store :tasks
+                fn (tasks)
+                  conj tasks $ {} (:id op-id) (:time op-time) (:done? false) (:text data)
+              :rm-task $ update store :tasks
+                fn (tasks)
+                  -> tasks $ filter
+                    fn (t)
+                      not= data $ :id t
+              :toggle-task $ update store :tasks
+                fn (tasks)
+                  -> tasks $ map
+                    fn (task)
+                      if
+                        = data $ :id task
+                        update task :done? not
+                        , task
+              :hydrate-storage data
     |reacher.app.config $ {}
       :ns $ quote (ns reacher.app.config)
       :defs $ {}
@@ -70,7 +88,7 @@
           defn render-app! () $ render! mount-target
             wrap-comp dispatch-provider
               js-object $ "\"value" dispatch!
-              wrap-comp comp-container @*store
+              wrap-comp comp-container $ js-object (:store @*store)
         |persist-storage! $ quote
           defn persist-storage! () $ .!setItem js/localStorage (:storage-key config/site) (format-cirru-edn @*store)
         |mount-target $ quote
@@ -82,20 +100,21 @@
             render-app!
             add-watch *store :changes $ fn (s prev) (render-app!)
             .!addEventListener js/window |beforeunload $ fn (event) (persist-storage!)
-            repeat! 60 persist-storage!
-            let
+            ; repeat! 60 persist-storage!
+            ; let
                 raw $ .!getItem js/localStorage (:storage-key config/site)
               when (some? raw)
                 dispatch! :hydrate-storage $ parse-cirru-edn raw
             println "|App started."
         |*store $ quote
           defatom *store $ {}
+            :tasks $ []
         |dispatch! $ quote
           defn dispatch! (op op-data)
             when
               and config/dev? $ not= op :states
               println "\"Dispatch:" op
-            reset! *store $ updater @*store op op-data nil nil
+            reset! *store $ updater @*store op op-data (js/Date.now) (js/Date.now)
         |reload! $ quote
           defn reload! () $ if (nil? build-errors)
             do (remove-watch *store :changes)
@@ -118,38 +137,64 @@
           "\"react" :as React
       :defs $ {}
         |comp-container $ quote
-          defn comp-container (? props children)
+          defn comp-container (props ? children)
             let
+                store $ .-store props
                 *draft $ use-atom "\""
                 d! $ use-dispatch
-              use-effect! ([] 1)
-                fn () $ println "\"effect"
+                tasks $ :tasks store
               div
-                {} $ :style (merge ui/global ui/row)
-                textarea $ {}
-                  :value $ .get *draft
-                  :placeholder "\"Content"
-                  :style $ merge ui/expand ui/textarea
-                    {} $ :height 320
-                  :on-change $ fn (event)
-                    .set! *draft $ -> event .-target .-value
-                =< 8 nil
-                wrap-comp memod-comp-task $ js-object
+                {} $ :style
+                  merge ui/global ui/column $ {} (:padding 16)
                 div
-                  {} $ :style ui/expand
-                  =< |8px nil
+                  {} $ :style ui/row
+                  input $ {}
+                    :value $ .get *draft
+                    :placeholder "\"Content"
+                    :style $ merge ui/input
+                    :on-change $ fn (event)
+                      .set! *draft $ -> event .-target .-value
+                  =< 8 nil
                   button
                     {} (:style ui/button)
                       :on-click $ fn (event)
-                        println $ .get *draft
-                        d! :demo :demo
+                        d! :add-task $ .get *draft
+                        .set! *draft "\""
                     , "\"Run"
+                =< 8 nil
+                div ({}) & $ -> tasks
+                  map $ fn (task)
+                    wrap-comp memod-comp-task $ &js-object :task task :id (:id task)
         |comp-task $ quote
-          defn comp-task (? task children)
+          defn comp-task (? props children)
             use-effect!
               [] $ js/Math.random
               fn () $ println "\"effect"
-            div ({}) "\"TODO"
+            js/console.log "\"task" props
+            let
+                task $ .-task props
+                d! $ use-dispatch
+              div
+                {} $ :style
+                  merge ui/row-middle $ {} (:margin "\"4px")
+                div $ {}
+                  :style $ {}
+                    :background-color $ if (:done? task) (hsl 0 0 80) :red
+                    :width 24
+                    :height 24
+                  :on-click $ fn (e)
+                    d! :toggle-task $ :id task
+                =< 8 nil
+                div
+                  {} $ :style
+                    {} $ :min-width 200
+                  :text task
+                =< 8 nil
+                div
+                  {} $ :on-click
+                    fn (e)
+                      d! :rm-task $ :id task
+                  , "\"rm"
         |memod-comp-task $ quote
           def memod-comp-task $ re-memo comp-task
     |reacher.core $ {}
@@ -163,8 +208,15 @@
               if (keyword? x) (turn-string x) x
         |div $ quote
           defn div (props & children) (create-element "\"div" props children)
+        |img $ quote
+          defn img (props & children) (create-element "\"img" props children)
+        |pre $ quote
+          defn pre (props & children) (create-element "\"pre" props children)
         |span $ quote
           defn span (props & children) (create-element "\"span" props children)
+        |tag* $ quote
+          defn tag* (name props & children)
+            create-element (turn-string name) props children
         |props-equal $ quote
           defn props-equal (prev next)
             let
@@ -172,7 +224,7 @@
                 n-fields $ js/Object.keys next
               if
                 = (.-length p-fields) (.-length n-fields)
-                .!every p-fields $ fn (k)
+                .!every p-fields $ fn (k idx ? p)
                   and (.includes n-fields k)
                     = (aget prev k) (aget next k)
                 , false
@@ -240,8 +292,12 @@
                 to-js-data
         |button $ quote
           defn button (props & children) (create-element "\"button" props children)
+        |canvas $ quote
+          defn canvas (props & children) (create-element "\"div" props children)
         |use-dispatch $ quote
           defn use-dispatch () $ React/useContext context-of-dispatch
+        |a $ quote
+          defn a (props & children) (create-element "\"a" props children)
         |re-memo $ quote
           defn re-memo (c) (React/memo c props-equal)
         |dispatch-provider $ quote
