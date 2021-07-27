@@ -1,20 +1,34 @@
 
 {} (:package |reacher)
   :configs $ {} (:init-fn |reacher.app.main/main!) (:reload-fn |reacher.app.main/reload!)
-    :modules $ [] |respo.calcit/ |lilac/ |memof/ |respo-ui.calcit/
+    :modules $ [] |respo-ui.calcit/
     :version |0.0.1
   :files $ {}
     |reacher.app.updater $ {}
       :ns $ quote
         ns reacher.app.updater $ :require
-          respo.cursor :refer $ update-states
       :defs $ {}
         |updater $ quote
           defn updater (store op data op-id op-time)
-            case op
-              :states $ update-states store data
+            case-default op
+              do (println "\"unknown op:" op) store
+              :add-task $ update store :tasks
+                fn (tasks)
+                  conj tasks $ {} (:id op-id) (:time op-time) (:done? false) (:text data)
+              :rm-task $ update store :tasks
+                fn (tasks)
+                  -> tasks $ filter
+                    fn (t)
+                      not= data $ :id t
+              :toggle-task $ update store :tasks
+                fn (tasks)
+                  -> tasks $ map
+                    fn (task)
+                      if
+                        = data $ :id task
+                        update task :done? not
+                        , task
               :hydrate-storage data
-              op store
     |reacher.app.config $ {}
       :ns $ quote (ns reacher.app.config)
       :defs $ {}
@@ -25,6 +39,40 @@
     |reacher.app.schema $ {}
       :ns $ quote (ns reacher.app.schema)
       :defs $ {}
+    |reacher.util.str $ {}
+      :ns $ quote (ns reacher.util.str)
+      :defs $ {}
+        |dashed->camel $ quote
+          defn dashed->camel (x)
+            .!replace x dashed-letter-pattern $ fn (cc pos prop)
+              .!toUpperCase $ aget cc 1
+        |dashed-letter-pattern $ quote
+          def dashed-letter-pattern $ new js/RegExp "\"-[a-z]" "\"g"
+        |escape-html $ quote
+          defn escape-html (text)
+            if (nil? text) "\"" $ -> text (.!replace "|\"" |&quot;) (.!replace |< |&lt;) (.!replace |> |&gt;) (.!replace &newline "\"&#13;&#10;")
+        |pattern-non-dimension-props $ quote
+          def pattern-non-dimension-props $ new js/RegExp "\"acit|ex(?:s|g|n|p|$)|rph|grid|ows|mnc|ntw|ine[ch]|zoo|^ord|itera" "\"i"
+        |style->string $ quote
+          defn style->string (styles)
+            -> styles (.to-list)
+              map $ fn (entry)
+                let
+                    k $ first entry
+                    style-name $ turn-string k
+                    v $ w-log
+                      get-style-value (last entry) (dashed->camel style-name)
+                  str style-name |: (escape-html v) |;
+              join-str |
+        |get-style-value $ quote
+          defn get-style-value (x prop)
+            cond
+                string? x
+                , x
+              (keyword? x) (turn-string x)
+              (number? x)
+                if (.!test pattern-non-dimension-props prop) (str x) (str x "\"px")
+              true $ str x
     |reacher.app.main $ {}
       :ns $ quote
         ns reacher.app.main $ :require
@@ -32,13 +80,15 @@
           reacher.app.updater :refer $ updater
           reacher.app.schema :as schema
           reacher.app.config :as config
+          reacher.core :refer $ render! wrap-comp dispatch-provider
           "\"./calcit.build-errors" :default build-errors
           "\"bottom-tip" :default hud!
-          "\"react-dom" :as ReactDOM
-          "\"react" :as React
       :defs $ {}
         |render-app! $ quote
-          defn render-app! () $ ReactDOM/render (React/createElement comp-container @*store) mount-target
+          defn render-app! () $ render! mount-target
+            wrap-comp dispatch-provider
+              js-object $ "\"value" dispatch!
+              wrap-comp comp-container $ js-object (:store @*store)
         |persist-storage! $ quote
           defn persist-storage! () $ .!setItem js/localStorage (:storage-key config/site) (format-cirru-edn @*store)
         |mount-target $ quote
@@ -46,23 +96,25 @@
         |main! $ quote
           defn main! ()
             println "\"Running mode:" $ if config/dev? "\"dev" "\"release"
+            if config/dev? $ load-console-formatter!
             render-app!
             add-watch *store :changes $ fn (s prev) (render-app!)
             .!addEventListener js/window |beforeunload $ fn (event) (persist-storage!)
-            repeat! 60 persist-storage!
-            let
+            ; repeat! 60 persist-storage!
+            ; let
                 raw $ .!getItem js/localStorage (:storage-key config/site)
               when (some? raw)
                 dispatch! :hydrate-storage $ parse-cirru-edn raw
             println "|App started."
         |*store $ quote
           defatom *store $ {}
+            :tasks $ []
         |dispatch! $ quote
           defn dispatch! (op op-data)
             when
               and config/dev? $ not= op :states
               println "\"Dispatch:" op
-            reset! *store $ updater @*store op op-data nil nil
+            reset! *store $ updater @*store op op-data (js/Date.now) (js/Date.now)
         |reload! $ quote
           defn reload! () $ if (nil? build-errors)
             do (remove-watch *store :changes)
@@ -79,34 +131,76 @@
     |reacher.app.comp.container $ {}
       :ns $ quote
         ns reacher.app.comp.container $ :require (respo-ui.core :as ui)
+          respo-ui.core :refer $ hsl
           reacher.app.config :refer $ dev?
-          reacher.core :refer $ defcomp div =< textarea span input button
+          reacher.core :refer $ defcomp div =< textarea span input button use-atom use-dispatch use-effect! re-memo wrap-comp
           "\"react" :as React
       :defs $ {}
         |comp-container $ quote
-          defn comp-container (? props children)
+          defn comp-container (props ? children)
             let
-                a $ React/useState "\""
-                draft $ aget a 0
-                set-draft! $ aget a 1
+                store $ .-store props
+                *draft $ use-atom "\""
+                d! $ use-dispatch
+                tasks $ :tasks store
               div
-                {} $ :style (merge ui/global ui/row)
-                textarea $ {} (:value draft) (:placeholder "\"Content")
-                  :style $ merge ui/expand ui/textarea
-                    {} $ :height 320
-                  :on-input $ fn (event)
-                    set-draft! $ -> event .-target .-value
-                =< 8 nil
+                {} $ :style
+                  merge ui/global ui/column $ {} (:padding 16)
                 div
-                  {} $ :style ui/expand
-                  =< |8px nil
+                  {} $ :style ui/row
+                  input $ {}
+                    :value $ .get *draft
+                    :placeholder "\"Content"
+                    :style $ merge ui/input
+                    :on-change $ fn (event)
+                      .set! *draft $ -> event .-target .-value
+                  =< 8 nil
                   button
                     {} (:style ui/button)
-                      :on-click $ fn (event) (println draft)
+                      :on-click $ fn (event)
+                        d! :add-task $ .get *draft
+                        .set! *draft "\""
                     , "\"Run"
+                =< 8 nil
+                div ({}) & $ -> tasks
+                  map $ fn (task)
+                    wrap-comp memod-comp-task $ &js-object :task task :id (:id task)
+        |comp-task $ quote
+          defn comp-task (? props children)
+            use-effect!
+              [] $ js/Math.random
+              fn () $ println "\"effect"
+            js/console.log "\"task" props
+            let
+                task $ .-task props
+                d! $ use-dispatch
+              div
+                {} $ :style
+                  merge ui/row-middle $ {} (:margin "\"4px")
+                div $ {}
+                  :style $ {}
+                    :background-color $ if (:done? task) (hsl 0 0 80) :red
+                    :width 24
+                    :height 24
+                  :on-click $ fn (e)
+                    d! :toggle-task $ :id task
+                =< 8 nil
+                div
+                  {} $ :style
+                    {} $ :min-width 200
+                  :text task
+                =< 8 nil
+                div
+                  {} $ :on-click
+                    fn (e)
+                      d! :rm-task $ :id task
+                  , "\"rm"
+        |memod-comp-task $ quote
+          def memod-comp-task $ re-memo comp-task
     |reacher.core $ {}
       :ns $ quote
-        ns reacher.core $ :require ("\"react" :as React)
+        ns reacher.core $ :require ("\"react" :as React) ("\"react-dom" :as ReactDOM)
+          reacher.util.str :refer $ get-style-value dashed->camel
       :defs $ {}
         |map-strip-keyword $ quote
           defn map-strip-keyword (xs)
@@ -114,8 +208,26 @@
               if (keyword? x) (turn-string x) x
         |div $ quote
           defn div (props & children) (create-element "\"div" props children)
+        |img $ quote
+          defn img (props & children) (create-element "\"img" props children)
+        |pre $ quote
+          defn pre (props & children) (create-element "\"pre" props children)
         |span $ quote
           defn span (props & children) (create-element "\"span" props children)
+        |tag* $ quote
+          defn tag* (name props & children)
+            create-element (turn-string name) props children
+        |props-equal $ quote
+          defn props-equal (prev next)
+            let
+                p-fields $ js/Object.keys prev
+                n-fields $ js/Object.keys next
+              if
+                = (.-length p-fields) (.-length n-fields)
+                .!every p-fields $ fn (k idx ? p)
+                  and (.includes n-fields k)
+                    = (aget prev k) (aget next k)
+                , false
         |create-element $ quote
           defn create-element (tag props children)
             React/createElement (turn-string tag) (transform-props props) & children
@@ -123,6 +235,13 @@
           defn textarea (props & children) (create-element "\"textarea" props children)
         |input $ quote
           defn input (props & children) (create-element "\"input" props children)
+        |use-atom $ quote
+          defn use-atom (v)
+            let
+                xs $ React/useState v
+                s $ aget xs 0
+                s! $ aget xs 1
+              :: %state-ref $ [] s s!
         |=< $ quote
           defn =< (w h)
             if (number? w)
@@ -130,17 +249,40 @@
                 "\"style" $ js-object ("\"width" w)
               React/createElement "\"div" $ js-object
                 "\"style" $ js-object ("\"height" h)
-        |dashed->camel $ quote
-          defn dashed->camel (x)
-            .!replace x dashed-letter-pattern $ fn (cc pos prop)
-              .!toUpperCase $ aget cc 1
+        |wrap-comp $ quote
+          defn wrap-comp (f props & children) (React/createElement f props & children)
+        |use-effect! $ quote
+          defn use-effect! (params f)
+            let
+                r* $ React/useRef params
+              if
+                not= params $ .-current r*
+                do $ set! (.-current r*) params
+              React/useEffect f $ js-array & (.-current r*)
+        |context-of-dispatch $ quote
+          def context-of-dispatch $ React/createContext
+            fn (op data) (js/console.warn "\"missing dispatch function" op)
+        |%state-ref $ quote
+          defrecord! %state-ref
+            :get $ fn (xs)
+              -> xs (nth 1) (nth 0)
+            :set! $ fn (xs v)
+                -> xs (nth 1) (nth 1)
+                , v
         |transform-props $ quote
           defn transform-props (props)
             if (nil? props) (&js-object)
               -> props
                 map-kv $ fn (k v)
                   if (= :style k)
-                    [] "\"style" $ transform-props (:style props)
+                    [] "\"style" $ let
+                        s $ :style props
+                      if (nil? s) "\"" $ -> s
+                        map-kv $ fn (k v)
+                          let
+                              prop $ dashed->camel (turn-string k)
+                            [] prop $ get-style-value v prop
+                        to-js-data
                     []
                       dashed->camel $ turn-string k
                       cond
@@ -148,7 +290,17 @@
                           , v
                         true $ turn-string v
                 to-js-data
-        |dashed-letter-pattern $ quote
-          def dashed-letter-pattern $ new js/RegExp "\"-[a-z]" "\"g"
         |button $ quote
           defn button (props & children) (create-element "\"button" props children)
+        |canvas $ quote
+          defn canvas (props & children) (create-element "\"div" props children)
+        |use-dispatch $ quote
+          defn use-dispatch () $ React/useContext context-of-dispatch
+        |a $ quote
+          defn a (props & children) (create-element "\"a" props children)
+        |re-memo $ quote
+          defn re-memo (c) (React/memo c props-equal)
+        |dispatch-provider $ quote
+          def dispatch-provider $ .-Provider context-of-dispatch
+        |render! $ quote
+          defn render! (target el) (ReactDOM/render el target)
