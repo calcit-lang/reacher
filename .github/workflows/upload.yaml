@@ -40,7 +40,6 @@ jobs:
         calcit calcit.cirru analyze dynamic-methods --max 0
         calcit calcit.cirru analyze quality --baseline config/calcit-quality.cirru
         calcit calcit.cirru docs check-md README.md
-        calcit calcit.cirru js
         yarn test:ffi
 
     - name: Build site
