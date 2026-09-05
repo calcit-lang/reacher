@@ -1,7 +1,14 @@
 
 .compact-inc.cirru
 .calcit-error.cirru
+.calcit/
 
 js-out/
 node_modules/
 dist/
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/sdks
+!.yarn/versions
