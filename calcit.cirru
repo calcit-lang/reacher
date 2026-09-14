@@ -242,21 +242,26 @@
                   if (list? tasks)
                     let
                         decoded-tasks $ map tasks $ fn (data)
-                          if (struct? data)
-                            struct-match data
-                              Task task $ %some task
-                              _ _ $ %none
-                            if (map? data)
-                              option:let
-                                  id $ get data :id
-                                  time $ get data :time
-                                  done? $ get data :done?
-                                  text $ get data :text
-                                if
-                                  and (string? id) (number? time) (bool? done?) (string? text)
-                                  %some $ Task :id id :time time :done? done? :text text
-                                  %none
-                              %none
+                          assert-type
+                            let
+                                candidate $ if (struct? data)
+                                  struct-match data
+                                    Task task $ %some task
+                                    _ _ $ %none
+                                  if (map? data) (%some data) (%none)
+                              match candidate
+                                (:some value)
+                                  option:let
+                                      id $ get value :id
+                                      time $ get value :time
+                                      done? $ get value :done?
+                                      text $ get value :text
+                                    if
+                                      and (string? id) (number? time) (bool? done?) (string? text)
+                                      %some $ Task :id id :time time :done? done? :text text
+                                      %none
+                                (:none) (%none)
+                            :: 'Option 'reacher.app.schema/Task
                       if (every? decoded-tasks option:some?)
                         %some $ Store :tasks $ assert-type (map decoded-tasks option:unwrap) (:: 'List 'reacher.app.schema/Task)
                         %none
