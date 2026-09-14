@@ -240,7 +240,31 @@
               match (get data :tasks)
                 (:some tasks)
                   if (list? tasks)
-                    %some $ Store :tasks $ assert-type tasks (:: 'List 'reacher.app.schema/Task)
+                    let
+                        decoded-tasks $ map tasks $ fn (data)
+                          assert-type
+                            let
+                                candidate $ if (struct? data)
+                                  struct-match data
+                                    Task task $ %some task
+                                    _ _ $ %none
+                                  if (map? data) (%some data) (%none)
+                              match candidate
+                                (:some value)
+                                  option:let
+                                      id $ get value :id
+                                      time $ get value :time
+                                      done? $ get value :done?
+                                      text $ get value :text
+                                    if
+                                      and (string? id) (number? time) (bool? done?) (string? text)
+                                      %some $ Task :id id :time time :done? done? :text text
+                                      %none
+                                (:none) (%none)
+                            :: 'Option 'reacher.app.schema/Task
+                      if (every? decoded-tasks option:some?)
+                        %some $ Store :tasks $ assert-type (map decoded-tasks option:unwrap) (:: 'List 'reacher.app.schema/Task)
+                        %none
                     %none
                 (:none) (%none)
               %none
@@ -541,22 +565,34 @@
           :code $ quote $ defn read-store-prop (props)
             let
                 value $ contract/object-field |component.props props |store
-              if (struct? value) (unsafe-coerce value 'reacher.app.schema/Store)
+              if (struct? value)
+                struct-match value (reacher.app.schema/Store store store)
+                  _ _ $ raise |JS_FFI_contract_violation:_component.props.store_expected_Store
                 raise |JS_FFI_contract_violation:_component.props.store_expected_Store
           :examples $ []
           :schema $ :: 'Fn $ {} (:return 'reacher.app.schema/Store)
             :args $ [] $ :: 'JsNullish 'JsObject
             :features $ #{} :js-ffi
+          :tests $ [] $ %{} 'TestEntry (:name |reject-task-as-store)
+            :code $ quote $ calcit.test/is-throws
+              read-store-prop $ js-object $ :store
+                reacher.app.schema/Task :id |t :time 0 :done? false :text |x
         'read-task-prop $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn read-task-prop (props)
             let
                 value $ contract/object-field |component.props props |task
-              if (struct? value) (unsafe-coerce value 'reacher.app.schema/Task)
+              if (struct? value)
+                struct-match value (reacher.app.schema/Task task task)
+                  _ _ $ raise |JS_FFI_contract_violation:_component.props.task_expected_Task
                 raise |JS_FFI_contract_violation:_component.props.task_expected_Task
           :examples $ []
           :schema $ :: 'Fn $ {} (:return 'reacher.app.schema/Task)
             :args $ [] $ :: 'JsNullish 'JsObject
             :features $ #{} :js-ffi
+          :tests $ [] $ %{} 'TestEntry (:name |reject-store-as-task)
+            :code $ quote $ calcit.test/is-throws
+              read-task-prop $ js-object $ :task
+                reacher.app.schema/Store :tasks $ []
       :ns $ %{} 'NsEntry (:doc |)
         :code $ quote $ ns reacher.ffi
           :require $ js-ffi.contract :as contract
