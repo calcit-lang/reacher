@@ -27,16 +27,18 @@ use-effect! ([] :a :b) $ fn ()
 ```cirru.no-check
 let
     *r $ use-atom |demo
-  println $ .get *r
+  println $ :value *r
   div $ {}
     :on-click $ fn (event)
-      .set! *r |another
+      let
+          setter $ :setter *r
+        setter |another
 ```
 
 ```cirru.no-check
 wrap-comp dispatch-provider
   js-object $ "\"value" dispatch!
-  wrap-comp comp-container @*store
+  wrap-comp comp-container $ js-object $ :store @*store
 ```
 
 ```cirru.no-check
