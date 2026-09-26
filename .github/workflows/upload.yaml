@@ -42,7 +42,7 @@ jobs:
         calcit calcit.cirru analyze check-public --ns reacher.core --ns reacher.ffi --ns reacher.util.str --summary-only
         calcit calcit.cirru analyze check-types --summary-only
         calcit calcit.cirru analyze weak-types --only schema-dynamic,unresolved-type-slot,code-dynamic --intent unresolved --summary-only
-        calcit calcit.cirru analyze dynamic-methods --max 0
+        calcit calcit.cirru analyze dynamic-methods
         calcit calcit.cirru analyze quality --baseline config/calcit-quality.cirru
         calcit calcit.cirru docs check-md README.md
         yarn test:ffi
