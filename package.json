@@ -1,17 +1,20 @@
 {
   "dependencies": {
-    "@calcit/procs": "0.24.3",
+    "@calcit/procs": "0.27.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },
   "devDependencies": {
     "bottom-tip": "^0.1.3",
-    "vite": "^8.3.0"
+    "vite": "8.3.1"
   },
   "packageManager": "yarn@4.18.0",
   "scripts": {
-    "build": "calcit calcit.cirru js && vite build --base=./",
+    "compile": "calcit calcit.cirru js",
+    "build": "yarn compile && vite build",
+    "dev": "vite",
+    "release": "yarn build",
     "test:ffi": "calcit calcit.cirru js && node tests/ffi-contracts.mjs"
   },
-  "version": "0.0.5"
+  "version": "0.0.6"
 }
