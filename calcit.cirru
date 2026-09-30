@@ -199,6 +199,7 @@
               fn () (cb)
                 repeat! (* 1000 duration) cb
               * 1000 duration
+            , &unit
           :examples $ []
           :schema $ :: 'Fn $ {} (:return 'Unit)
             :args $ [] 'Number $ :: 'Fn
@@ -246,9 +247,9 @@
                             let
                                 candidate $ if (struct? data)
                                   struct-match data
-                                    Task task $ %some task
-                                    _ _ $ %none
-                                  if (map? data) (%some data) (%none)
+                                    Task task $ Option :some task
+                                    _ _ $ Option :none
+                                  if (map? data) (Option :some data) (Option :none)
                               match candidate
                                 (:some value)
                                   option:let
@@ -258,16 +259,16 @@
                                       text $ get value :text
                                     if
                                       and (string? id) (number? time) (bool? done?) (string? text)
-                                      %some $ Task :id id :time time :done? done? :text text
-                                      %none
-                                (:none) (%none)
+                                      Option :some $ Task :id id :time time :done? done? :text text
+                                      Option :none
+                                (:none) (Option :none)
                             :: 'Option 'reacher.app.schema/Task
                       if (every? decoded-tasks option:some?)
-                        %some $ Store :tasks $ assert-type (map decoded-tasks option:unwrap) (:: 'List 'reacher.app.schema/Task)
-                        %none
-                    %none
-                (:none) (%none)
-              %none
+                        Option :some $ Store :tasks $ assert-type (map decoded-tasks option:unwrap) (:: 'List 'reacher.app.schema/Task)
+                        Option :none
+                    Option :none
+                (:none) (Option :none)
+              Option :none
           :examples $ []
           :schema $ :: 'Fn $ {}
             :args $ [] 'Dynamic
@@ -660,9 +661,11 @@
             -> (&map:to-list styles)
               map $ fn (entry)
                 let
-                    k $ first entry
+                    k $ option:unwrap $ first entry
                     style-name $ turn-string k
-                    v $ w-log $ get-style-value (last entry) (dashed->camel style-name)
+                    v $ w-log $ get-style-value
+                      option:unwrap $ last entry
+                      dashed->camel style-name
                   str style-name |: (escape-html v) |;
               join-str |
           :examples $ []

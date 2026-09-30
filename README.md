@@ -2,7 +2,7 @@
 Reacher: React.js in calcit-js
 ----
 
-Demo http://repo.calcit-lang.org/reacher/ .
+Demo https://repo.calcit-lang.org/reacher/ .
 
 ### Usages
 
