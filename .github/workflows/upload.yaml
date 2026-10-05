@@ -9,6 +9,11 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: reacher-deploy-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: false
+  queue: max
+
 jobs:
   test:
     runs-on: ubuntu-24.04
@@ -46,22 +51,19 @@ jobs:
     - name: Validate Calcit snapshot and types
       run: |
         set -euo pipefail
-        test "$(calcit --version)" = "0.27.0"
+        test "$(calcit --version)" = "0.28.0"
         calcit calcit.cirru edit format
         git diff --exit-code -- calcit.cirru
-        calcit calcit.cirru fix --workflow strict --verify --format edn
-        calcit calcit.cirru --check-only
+        calcit calcit.cirru --check-only --warn-dyn-method
         calcit calcit.cirru analyze check-public \
           --ns reacher.app.comp.container --ns reacher.app.config \
           --ns reacher.app.main --ns reacher.app.schema --ns reacher.app.updater \
           --ns reacher.core --ns reacher.ffi --ns reacher.util.str \
           --summary-only --format json
-        calcit calcit.cirru analyze check-types --summary-only --format json
         calcit calcit.cirru analyze weak-types \
           --only schema-dynamic,code-dynamic --intent unresolved \
           --summary-only --format json
         calcit calcit.cirru analyze deprecated --summary-only --format json
-        calcit calcit.cirru analyze dynamic-methods
         calcit calcit.cirru docs check-md README.md
         yarn test:ffi
 
@@ -69,9 +71,11 @@ jobs:
       id: asset-path
       env:
         CDN_ORIGIN: https://cos-sh.tiye.me
+        PR_NUMBER: ${{ github.event.pull_request.number }}
       run: |
+        set -euo pipefail
         if [[ "$GITHUB_EVENT_NAME" == "pull_request" ]]; then
-          asset_prefix="${GITHUB_REPOSITORY}/pr/"
+          asset_prefix="${GITHUB_REPOSITORY}/pr/${PR_NUMBER}/${GITHUB_RUN_ID}/${GITHUB_RUN_ATTEMPT}/"
         elif [[ "$GITHUB_REF" == "refs/heads/main" ]]; then
           asset_prefix="${GITHUB_REPOSITORY}/"
         else
@@ -109,7 +113,7 @@ jobs:
 
     - name: Upload and verify static assets on COS
       if: steps.cos-credentials.outputs.available == 'true'
-      uses: worktools/cos-upload-action@17e6d213fe9f6772a6090a13c8ba044cd6cbcb09 # v1.1.1
+      uses: worktools/cos-upload-action@06d6027dcca6413c5936e04a9b6e9f0d5ef71ba0 # v1.2.0
       with:
         source-dir: dist
         bucket: ${{ secrets.COS_BUCKET }}

@@ -662,7 +662,7 @@
               map $ fn (entry)
                 let
                     k $ option:unwrap $ first entry
-                    style-name $ turn-string k
+                    style-name $ turn-string $ assert-type k Tag
                     v $ w-log $ get-style-value
                       option:unwrap $ last entry
                       dashed->camel style-name
