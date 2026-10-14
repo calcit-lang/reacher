@@ -11,7 +11,7 @@
     'reacher.app.comp.container $ %{} 'FileEntry
       :defs $ {}
         'comp-container $ %{} 'CodeEntry (:doc |)
-          :code $ quote $ defn comp-container (props)
+          :code $ quote $ defn comp-container (props & host-args)
             let
                 store $ ffi/read-store-prop props
                 *draft $ use-atom |
@@ -34,7 +34,7 @@
                   button
                     {} (:style ui/button)
                       :on-click $ fn (event)
-                        d! $ schema/Op :add-task $ assert-type (:value *draft) 'String
+                        d! $ schema/Op :add-task $ decode-map-as (:value *draft) 'String
                         let
                             setter $ :setter *draft
                           setter |
@@ -43,14 +43,14 @@
                 div ({}) & $ map tasks $ fn (task)
                   wrap-comp memod-comp-task $ &js-object :task task :id $ :id task
           :examples $ []
-          :schema $ :: 'Fn $ {} (:return 'JsObject)
+          :schema $ :: 'Fn $ {} (:rest 'Dynamic) (:return 'JsObject)
             :args $ [] $ :: 'JsNullish 'JsObject
             :features $ #{} :js-ffi
         'comp-task $ %{} 'CodeEntry (:doc |)
-          :code $ quote $ defn comp-task (props)
+          :code $ quote $ defn comp-task (props & host-args)
             use-effect!
               [] $ browser/random
-              fn () $ println |effect
+              fn () (println |effect) &unit
             js/console.log |task props
             let
                 task $ ffi/read-task-prop props
@@ -75,15 +75,13 @@
                     d! $ schema/Op :rm-task $ :id task
                   , |rm
           :examples $ []
-          :schema $ :: 'Fn $ {} (:return 'JsObject)
+          :schema $ :: 'Fn $ {} (:rest 'Dynamic) (:return 'JsObject)
             :args $ [] $ :: 'JsNullish 'JsObject
             :features $ #{} :js-ffi
         'memod-comp-task $ %{} 'CodeEntry (:doc |)
           :code $ quote $ def memod-comp-task (re-memo comp-task)
           :examples $ []
-          :schema $ :: 'Fn $ {} (:return 'JsObject)
-            :args $ [] $ :: 'JsNullish 'JsObject
-            :features $ #{} :js-ffi
+          :schema $ :: 'JsObject
       :ns $ %{} 'NsEntry (:doc |)
         :code $ quote $ ns reacher.app.comp.container
           :require (respo-ui.core :as ui)
@@ -127,17 +125,14 @@
             :features $ #{} :js-ffi
         'dispatch! $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn dispatch! (op)
-            when
-              and config/dev? $ not= op :states
-              println |Dispatch: op
+            when config/dev? $ println |Dispatch: op
             let
-                typed-op $ assert-type op 'Enum
                 now $ shared/date-now-snapshot
-              reset! *store $ updater @*store (assert-type typed-op 'reacher.app.schema/Op) (generate-id!) (:timestamp now)
+              reset! *store $ updater @*store op (generate-id!) (:timestamp now)
               , &unit
           :examples $ []
           :schema $ :: 'Fn $ {} (:return 'Unit)
-            :args $ [] 'Dynamic
+            :args $ [] 'reacher.app.schema/Op
             :features $ #{} :js-ffi
         'main! $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn main! ()
@@ -156,6 +151,7 @@
                   (:none) (hud! |error |Ignored_invalid_saved_state)
               (:none) &unit
             println |App_started.
+            , &unit
           :examples $ []
           :schema $ :: 'Fn $ {} (:return 'Unit)
             :args $ []
@@ -180,6 +176,7 @@
                 render-app!
                 hud! |ok~ |Ok
               hud! |error build-errors
+            , &unit
           :examples $ []
           :schema $ :: 'Fn $ {} (:return 'Unit)
             :args $ []
@@ -189,6 +186,7 @@
             mount-target .render! $ wrap-comp dispatch-provider
               js-object $ |value dispatch!
               wrap-comp comp-container $ js-object $ :store @*store
+            , &unit
           :examples $ []
           :schema $ :: 'Fn $ {} (:return 'Unit)
             :args $ []
@@ -311,7 +309,7 @@
       :defs $ {}
         '=< $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn =< (w h)
-            if (number? w)
+            js-ffi.contract/expect-object |React.=< $ if (number? w)
               React/createElement |div $ js-object $ |style
                 js-object $ |width w
               React/createElement |div $ js-object $ |style
@@ -382,7 +380,7 @@
             :features $ #{} :js-ffi
         'create-element $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn create-element (tag props children)
-            React/createElement (reacher.util.str/scalar-string tag) (transform-props props) & children
+            js-ffi.contract/expect-object |React.create-element $ React/createElement (reacher.util.str/scalar-string tag) (transform-props props) & children
           :examples $ []
           :schema $ :: 'Fn $ {} (:return 'JsObject)
             :args $ [] 'Dynamic 'Dynamic $ :: 'List 'Dynamic
@@ -447,13 +445,14 @@
             :args $ [] 'JsObject 'JsObject
             :features $ #{} :js-ffi
         're-memo $ %{} 'CodeEntry (:doc |)
-          :code $ quote $ defn re-memo (c) (React/memo c props-equal)
+          :code $ quote $ defn re-memo (c)
+            js-ffi.contract/expect-object |React.re-memo $ React/memo c props-equal
           :examples $ []
-          :schema $ :: 'Fn $ {} (:return 'Fn)
+          :schema $ :: 'Fn $ {} (:return 'JsObject)
             :args $ [] 'Fn
             :features $ #{} :js-ffi
         'render! $ %{} 'CodeEntry (:doc |)
-          :code $ quote $ defn render! (target el) (ReactDOM/render el target)
+          :code $ quote $ defn render! (target el) (ReactDOM/render el target) &unit
           :examples $ []
           :schema $ :: 'Fn $ {} (:return 'Unit)
             :args $ [] 'JsObject 'JsObject
@@ -479,7 +478,7 @@
             :features $ #{} :js-ffi
         'transform-props $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn transform-props (props)
-            if (nil? props) (&js-object)
+            js-ffi.contract/expect-object |React.transform-props $ if (nil? props) (&js-object)
               let
                   typed-props $ decode-map-as props $ :: 'Map 'Tag 'Dynamic
                 -> typed-props
@@ -488,7 +487,7 @@
                       :args $ [] 'Tag 'Dynamic
                       :return $ :: 'MapEntryDecision 'String 'Dynamic
                     if (= :style k)
-                      %:: MapEntryDecision :keep |style $ let
+                      MapEntryDecision :keep |style $ let
                           s $ decode-map-as
                             option:unwrap-or (get typed-props :style) ({})
                             :: 'Map 'Tag 'Dynamic
@@ -499,9 +498,9 @@
                               :return $ :: 'MapEntryDecision 'String 'String
                             let
                                 prop $ dashed->camel $ reacher.util.str/scalar-string style-key
-                              %:: MapEntryDecision :keep prop $ get-style-value style-value prop
+                              MapEntryDecision :keep prop $ get-style-value style-value prop
                           to-js-data
-                      %:: MapEntryDecision :keep
+                      MapEntryDecision :keep
                         dashed->camel $ reacher.util.str/scalar-string k
                         if (fn? v) v $ reacher.util.str/scalar-string v
                   to-js-data
@@ -525,7 +524,10 @@
             :args $ [] 'Dynamic
             :features $ #{} :js-ffi
         'use-dispatch $ %{} 'CodeEntry (:doc |)
-          :code $ quote $ defn use-dispatch () (React/useContext context-of-dispatch)
+          :code $ quote $ defn use-dispatch ()
+            let
+                value $ React/useContext context-of-dispatch
+              if (fn? value) value $ raise "|React dispatch context expects a function"
           :examples $ []
           :schema $ :: 'Fn $ {} (:return 'Fn)
             :args $ []
@@ -541,7 +543,8 @@
                 :args $ []
             :features $ #{} :js-ffi
         'wrap-comp $ %{} 'CodeEntry (:doc |)
-          :code $ quote $ defn wrap-comp (f props & children) (React/createElement f props & children)
+          :code $ quote $ defn wrap-comp (f props & children)
+            js-ffi.contract/expect-object |React.wrap-comp $ React/createElement f props & children
           :examples $ []
           :schema $ :: 'Fn $ {} (:rest 'Dynamic) (:return 'JsObject)
             :args $ [] 'Dynamic 'Dynamic
@@ -560,7 +563,7 @@
               contract/expect-string |event.target.value $ contract/object-field |event.target target |value
           :examples $ []
           :schema $ :: 'Fn $ {} (:return 'String)
-            :args $ [] $ :: 'JsNullish 'JsObject
+            :args $ [] 'Dynamic
             :features $ #{} :js-ffi
         'read-store-prop $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn read-store-prop (props)

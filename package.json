@@ -16,5 +16,5 @@
     "release": "yarn build",
     "test:ffi": "calcit calcit.cirru js && node tests/ffi-contracts.mjs"
   },
-  "version": "0.0.6"
+  "version": "0.0.7"
 }

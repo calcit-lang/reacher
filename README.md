@@ -72,7 +72,11 @@ CI 检查规范快照、严格入口、全部 8 个公共命名空间及现有 F
 
 props/style 输入通过实际 Map 解码；标量文本转换通过 `data-view` 收窄，
 保留 Tag 不带冒号的原有文本语义。watcher 使用 `add-watch!` / `remove-watch!`。
-完整严格门禁还需完成 React 返回值和应用回调的边界迁移；当前候选不代表部署验收完成。
+候选模块 0.0.7 修正 `re-memo` 为实际 React memo 组件对象；React element 在
+宿主边界检查，dispatch 接收具名 `Op`，Unit 回调明确返回 `&unit`。
+示例组件接收并忽略 React 额外宿主参数，不关闭 arity 检查。
+完整严格门禁保留 React 动态 children 的两个 spread 审查提示，不改为固定参数；
+生产部署仍以 main Actions 的实际验收为准。
 
 生产资源继续使用 `https://cos-sh.tiye.me/calcit-lang/reacher/`；PR 预览路径为
 `calcit-lang/reacher/pr/<PR 编号>/<run ID>/<attempt>/`，Vite 使用同一 CDN base。
