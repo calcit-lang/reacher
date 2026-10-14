@@ -63,12 +63,16 @@ https://github.com/calcit-lang/respo-calcit-workflow
 
 ### Calcit 与 COS/CDN
 
-Calcit 和 `@calcit/procs` 使用正式 0.28.0；模块依赖使用已发布的
-Respo UI 0.7.31、JS-FFI 0.2.0，不新增 alpha 或 Git hash 模块依赖。
-Caps 保留普通解析模式：Respo 的已发布依赖仍请求 JS-FFI 0.1.36，
-因此当前图存在版本选择警告，不能声称已通过 strict 依赖解析。
+Calcit 和 `@calcit/procs` 使用正式 0.29.3；模块依赖使用已发布的
+Respo UI 0.7.38、JS-FFI 0.2.2，不新增 alpha 或 Git hash 模块依赖。
+该正式依赖图统一到 Respo 0.16.119、Router 0.8.33 和 JS-FFI 0.2.2；
+CI 使用 `caps --strict --ci` 验证，不再允许版本选择警告。
 CI 检查规范快照、严格入口、全部 8 个公共命名空间及现有 FFI 测试；
 不再调用硬编码 fix preset 或重复输出类型统计。
+
+props/style 输入通过实际 Map 解码；标量文本转换通过 `data-view` 收窄，
+保留 Tag 不带冒号的原有文本语义。watcher 使用 `add-watch!` / `remove-watch!`。
+完整严格门禁还需完成 React 返回值和应用回调的边界迁移；当前候选不代表部署验收完成。
 
 生产资源继续使用 `https://cos-sh.tiye.me/calcit-lang/reacher/`；PR 预览路径为
 `calcit-lang/reacher/pr/<PR 编号>/<run ID>/<attempt>/`，Vite 使用同一 CDN base。

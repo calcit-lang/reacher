@@ -144,7 +144,7 @@
             println |Running_mode: $ if config/dev? |dev |release
             if config/dev? $ load-console-formatter!
             render-app!
-            add-watch *store :changes $ fn (s prev) (render-app!)
+            add-watch! *store :changes $ fn (s prev) (render-app!)
             browser/set-before-unload! $ fn (event) (persist-storage!)
             match
               browser/storage-get $ :storage-key config/site
@@ -175,8 +175,8 @@
         'reload! $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn reload! ()
             if (nil? build-errors)
-              do (remove-watch *store :changes)
-                add-watch *store :changes $ fn (s prev) (render-app!)
+              do (remove-watch! *store :changes)
+                add-watch! *store :changes $ fn (s prev) (render-app!)
                 render-app!
                 hud! |ok~ |Ok
               hud! |error build-errors
@@ -382,7 +382,7 @@
             :features $ #{} :js-ffi
         'create-element $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn create-element (tag props children)
-            React/createElement (turn-string tag) (transform-props props) & children
+            React/createElement (reacher.util.str/scalar-string tag) (transform-props props) & children
           :examples $ []
           :schema $ :: 'Fn $ {} (:return 'JsObject)
             :args $ [] 'Dynamic 'Dynamic $ :: 'List 'Dynamic
@@ -466,7 +466,7 @@
             :features $ #{} :js-ffi
         'tag* $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn tag* (name props & children)
-            create-element (turn-string name) props children
+            create-element (reacher.util.str/scalar-string name) props children
           :examples $ []
           :schema $ :: 'Fn $ {} (:rest 'Dynamic) (:return 'JsObject)
             :args $ [] 'Dynamic 'Dynamic
@@ -481,7 +481,7 @@
           :code $ quote $ defn transform-props (props)
             if (nil? props) (&js-object)
               let
-                  typed-props $ assert-type props $ :: 'Map 'Tag 'Dynamic
+                  typed-props $ decode-map-as props $ :: 'Map 'Tag 'Dynamic
                 -> typed-props
                   filter-map-kv $ fn (k v)
                     hint-fn $ {}
@@ -489,7 +489,7 @@
                       :return $ :: 'MapEntryDecision 'String 'Dynamic
                     if (= :style k)
                       %:: MapEntryDecision :keep |style $ let
-                          s $ assert-type
+                          s $ decode-map-as
                             option:unwrap-or (get typed-props :style) ({})
                             :: 'Map 'Tag 'Dynamic
                         if (empty? s) | $ -> s
@@ -498,12 +498,12 @@
                               :args $ [] 'Tag 'Dynamic
                               :return $ :: 'MapEntryDecision 'String 'String
                             let
-                                prop $ dashed->camel $ turn-string style-key
+                                prop $ dashed->camel $ reacher.util.str/scalar-string style-key
                               %:: MapEntryDecision :keep prop $ get-style-value style-value prop
                           to-js-data
                       %:: MapEntryDecision :keep
-                        dashed->camel $ turn-string k
-                        if (fn? v) v $ turn-string v
+                        dashed->camel $ reacher.util.str/scalar-string k
+                        if (fn? v) v $ reacher.util.str/scalar-string v
                   to-js-data
           :examples $ []
           :schema $ :: 'Fn $ {} (:return 'JsObject)
@@ -643,7 +643,7 @@
             cond
                 string? x
                 , x
-              (tag? x) (turn-string x)
+              (tag? x) (reacher.util.str/scalar-string x)
               (number? x)
                 if (pattern-non-dimension-props .test prop) (str x) (str x |px)
               true $ str x
@@ -656,18 +656,31 @@
             create-regex-host "|acit|ex(?:s|g|n|p|$)|rph|grid|ows|mnc|ntw|ine[ch]|zoo|^ord|itera" |i
           :examples $ []
           :schema $ :: 'reacher.util.str/RegexHost
+        'scalar-string $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defn scalar-string (value)
+            match (data-view value)
+              (:nil) |
+              (:string text) text
+              (:tag tag) (to-string tag)
+              (:number n) (to-string n)
+              (:bool b) (to-string b)
+              (:symbol sym) (to-string sym)
+              _ $ raise "|expected scalar text"
+          :examples $ []
+          :schema $ :: 'Fn $ {} (:return 'String)
+            :args $ [] 'Dynamic
         'style->string $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn style->string (styles)
             -> (&map:to-list styles)
               map $ fn (entry)
                 let
                     k $ option:unwrap $ first entry
-                    style-name $ turn-string $ assert-type k Tag
+                    style-name $ reacher.util.str/scalar-string $ decode-map-as k 'Tag
                     v $ w-log $ get-style-value
                       option:unwrap $ last entry
                       dashed->camel style-name
                   str style-name |: (escape-html v) |;
-              join-str |
+              join-string |
           :examples $ []
           :schema $ :: 'Fn $ {} (:return 'String)
             :args $ [] $ :: 'Map 'Tag 'V
