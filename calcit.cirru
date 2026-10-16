@@ -112,13 +112,13 @@
     'reacher.app.main $ %{} 'FileEntry
       :defs $ {}
         '*store $ %{} 'CodeEntry (:doc |)
-          :code $ quote $ defatom *store
+          :code $ quote $ defref *store
             schema/Store :tasks $ []
           :examples $ []
           :schema $ :: 'Ref 'reacher.app.schema/Store
         'create-root-host $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn create-root-host (target)
-            unsafe-coerce (createRoot target) 'reacher.core/ReactRootHost
+            js-cast (createRoot target) 'reacher.core/ReactRootHost
           :examples $ []
           :schema $ :: 'Fn $ {} (:return 'reacher.core/ReactRootHost)
             :args $ [] 'js-ffi.browser/DomElementHost
@@ -250,15 +250,18 @@
                                   if (map? data) (Option :some data) (Option :none)
                               match candidate
                                 (:some value)
-                                  option:let
-                                      id $ get value :id
-                                      time $ get value :time
-                                      done? $ get value :done?
-                                      text $ get value :text
-                                    if
-                                      and (string? id) (number? time) (bool? done?) (string? text)
-                                      Option :some $ Task :id id :time time :done? done? :text text
-                                      Option :none
+                                  .and-then (get value :id)
+                                    fn (id)
+                                      .and-then (get value :time)
+                                        fn (time)
+                                          .and-then (get value :done?)
+                                            fn (done?)
+                                              .and-then (get value :text)
+                                                fn (text)
+                                                  if
+                                                    and (string? id) (number? time) (bool? done?) (string? text)
+                                                    Option :some $ Task :id id :time time :done? done? :text text
+                                                    Option :none
                                 (:none) (Option :none)
                             :: 'Option 'reacher.app.schema/Task
                       if (every? decoded-tasks option:some?)
@@ -411,14 +414,14 @@
         'map-strip-keyword $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn map-strip-keyword (xs)
             map xs $ fn (x)
-              if (tag? x) (turn-string x) x
+              if (tag? x) (to-string x) x
           :examples $ []
           :schema $ :: 'Fn $ {}
             :args $ [] $ :: 'List 'Tag
             :return $ :: 'List 'String
         'object-keys-host $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn object-keys-host (value)
-            unsafe-coerce (js/Object.keys value) 'reacher.core/JsKeyArrayHost
+            js-cast (js/Object.keys value) 'reacher.core/JsKeyArrayHost
           :examples $ []
           :schema $ :: 'Fn $ {} (:return 'reacher.core/JsKeyArrayHost)
             :args $ [] 'JsObject
@@ -512,7 +515,7 @@
           :code $ quote $ defn use-atom (v)
             let
                 xs $ contract/expect-object |React.useState $ React/useState v
-                state $ unsafe-coerce (aget xs 0) 'Dynamic
+                state $ aget xs 0
                 setter $ unsafe-coerce
                   contract/expect-function |React.useState[1] $ aget xs 1
                   :: 'Fn $ {}
@@ -613,7 +616,7 @@
           :schema $ :: 'Trait
         'create-regex-host $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn create-regex-host (pattern flags)
-            unsafe-coerce (new js/RegExp pattern flags) 'reacher.util.str/RegexHost
+            js-cast (new js/RegExp pattern flags) 'reacher.util.str/RegexHost
           :examples $ []
           :schema $ :: 'Fn $ {} (:return 'reacher.util.str/RegexHost)
             :args $ [] 'String 'String
@@ -679,7 +682,7 @@
                 let
                     k $ option:unwrap $ first entry
                     style-name $ reacher.util.str/scalar-string $ decode-map-as k 'Tag
-                    v $ w-log $ get-style-value
+                    v $ dbg $ get-style-value
                       option:unwrap $ last entry
                       dashed->camel style-name
                   str style-name |: (escape-html v) |;
