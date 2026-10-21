@@ -54,13 +54,10 @@ jobs:
         set -euo pipefail
         calcit calcit.cirru edit format
         git diff --exit-code -- calcit.cirru
-        calcit calcit.cirru --check-only --warn-dyn-method
-        calcit calcit.cirru --check-only \
-          --ns reacher.app.comp.container --ns reacher.app.config \
-          --ns reacher.app.main --ns reacher.app.schema --ns reacher.app.updater \
-          --ns reacher.core --ns reacher.ffi --ns reacher.util.str \
-          --summary-only --format json
-        calcit calcit.cirru fix --workflow strict --verify
+        calcit calcit.cirru --check-only --all-defs --warn-dyn-method
+        report="$(calcit calcit.cirru fix --workflow strict --verify --format json)"
+        printf '%s\n' "$report"
+        jq -e '.data.workflow.status? == "passed" and .diagnostics? == []' <<< "$report"
         calcit calcit.cirru docs check-md README.md
         yarn test:ffi
 

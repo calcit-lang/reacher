@@ -4,6 +4,14 @@ Reacher: React.js in calcit-js
 
 Demo https://repo.calcit-lang.org/reacher/ .
 
+使用者注意：`0.0.8` 候选配对正式 Calcit CLI / `@calcit/procs` **0.30.1**，
+UI 升到 **0.8.0**；请同步完整依赖图、重新生成 JS 并完整刷新页面，不混装旧 alpha。
+React 18、公开组件 API、状态/存储格式及 setter 身份不变；UI 基础样式可能变化。
+Demo 先读取/恢复存档，再首次渲染和注册 watch/离页保存：解析抛错时不再留下
+会覆盖原存档的保存回调。合法 EDN 但不符合 Store 的值仍按原逻辑显示 HUD，
+本次不改变该分支的既定处理策略，也不承诺这种值会在离页后保留。
+发布与否以同名正式 tag 为准，源码版本号不是发布证据。
+
 ### Usages
 
 ```cirru.no-check
@@ -63,12 +71,11 @@ https://github.com/calcit-lang/respo-calcit-workflow
 
 ### Calcit 与 COS/CDN
 
-使用者影响：本轮源码配对已发布的 Calcit / `@calcit/procs` `0.30.1-alpha.5`；
-模块依赖升级到正式 Respo UI `0.7.41`，保留 JS-FFI `0.2.3`，不新增 alpha
-或 Git hash 模块依赖。该正式依赖图统一到 Respo `0.16.122`、Router `0.8.36`
-和 JS-FFI `0.2.3`，不混用尚未完成发布的 JS-FFI 0.2.4 依赖波次；
+本轮候选配对正式 Calcit / `@calcit/procs` `0.30.1`；
+模块依赖为已发布的 Respo UI `0.8.0`、JS-FFI `0.2.5`，不新增 alpha
+或 Git hash 模块依赖。传递依赖统一到 Respo `0.16.124`、Router `0.8.37`；
 CI 使用 `caps --strict --ci` 验证，不再允许版本选择警告。
-CI 检查规范快照、严格入口、全部 8 个公共命名空间及现有 FFI 测试；
+CI 检查规范快照、全部定义和现有 FFI 测试，完整 strict 要求 passed 且 diagnostics 为空；
 不再调用硬编码 fix preset 或重复输出类型统计。
 
 props/style 输入通过实际 Map 解码；标量文本转换通过 `data-view` 收窄，
@@ -85,9 +92,9 @@ props/style 输入通过实际 Map 解码；标量文本转换通过 `data-view`
 React FFI 强转，不用每次 render 新建的闭包替代。原状态、children、memo、
 事件派发、存储 key 和部署路径不变；非法宿主能力现在在边界提前拒绝。
 不新增验证脚本、框架、强转或类型预算。候选版本号不表示已发布，发版前仍需
-最新 CI/review、真实浏览器和消费者验收。本轮不改 Snapshot、公开 API 或测试，
-不发版、不合并生产部署；正式 `0.30.1` 当前资产尚未包含 macOS 二进制，
-本次 alpha.5 配对验收不代表正式版的完整跨平台兼容保证。
+最新 CI/review、真实浏览器和消费者验收。本轮 Snapshot 仅移动 Demo 启动中的原存档恢复
+表达式，原解析、decode/hydrate、HUD 和异常传播不变，不修改 schema、公开 API 或测试。
+正式 Linux CI 不代表所有平台均已验收或均有正式预编译 CLI；本地原 alpha 基线不是正式验收。
 同时将 `defatom`、`turn-string`、`w-log` 改为当前 `defref`、`to-string`、`dbg`，
 将存储解码的 `option:let` 展开为原顺序的 `.and-then`，保留首个 None 时短路。
 原测试和 schema 不变，项目已无 deprecated-call 命中；这不是全生态入口退役证明。
@@ -97,6 +104,10 @@ React FFI 强转，不用每次 render 新建的闭包替代。原状态、child
 COS Action 固定到正式 v1.2.0，通过 `public-base-url` 启用内置上传校验，
 不增加额外校验脚本。同一 PR 或生产分支串行排队，不取消正在上传的任务。
 原有服务器部署仅在 main push 执行，资源来源和目标路径保持不变。
+
+同仓库 PR 按原流程上传隔离预览，main 合并会自动部署原 Demo；不合并或部署
+其他业务应用。源码、测试和示例的迁移预览都须核对，预览为空不意味着整个生态
+已无旧入口，也不能作为上游删除兼容规则的充分证据。
 
 ### License
 

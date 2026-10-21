@@ -138,9 +138,6 @@
           :code $ quote $ defn main! ()
             println |Running_mode: $ if config/dev? |dev |release
             if config/dev? $ load-console-formatter!
-            render-app!
-            add-watch! *store :changes $ fn (s prev) (render-app!)
-            browser/set-before-unload! $ fn (event) (persist-storage!)
             match
               browser/storage-get $ :storage-key config/site
               (:some raw)
@@ -150,6 +147,9 @@
                     dispatch! $ schema/Op :hydrate-storage stored
                   (:none) (hud! |error |Ignored_invalid_saved_state)
               (:none) &unit
+            render-app!
+            add-watch! *store :changes $ fn (s prev) (render-app!)
+            browser/set-before-unload! $ fn (event) (persist-storage!)
             println |App_started.
             , &unit
           :examples $ []
