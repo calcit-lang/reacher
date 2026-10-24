@@ -18,14 +18,14 @@
                 d! $ use-dispatch
                 tasks $ :tasks store
               div
-                {} $ :style $ merge ui/global ui/column
+                {} $ :style $ .merge ui/global ui/column
                   {} $ :padding |16px
                 div
                   {} $ :style ui/row
                   input $ {}
                     :value $ :value *draft
                     :placeholder |Content
-                    :style $ merge ui/input
+                    :style ui/input
                     :on-change $ fn (event)
                       let
                           setter $ :setter *draft
@@ -40,7 +40,9 @@
                           setter |
                     , |Run
                 =< 8 0
-                div ({}) & $ map tasks $ fn (task)
+                div ({}) & $ .map tasks $ fn (task)
+                  hint-fn $ {} (:return 'JsObject)
+                    :args $ [] 'reacher.app.schema/Task
                   wrap-comp memod-comp-task $ &js-object :task task :id $ :id task
           :examples $ []
           :schema $ :: 'Fn $ {} (:rest 'Dynamic) (:return 'JsObject)
@@ -56,7 +58,7 @@
                 task $ ffi/read-task-prop props
                 d! $ use-dispatch
               div
-                {} $ :style $ merge ui/row-middle
+                {} $ :style $ .merge ui/row-middle
                   {} $ :margin :4px
                 div $ {}
                   :style $ {}
@@ -100,7 +102,7 @@
           :schema $ :: 'StructDef
         'dev? $ %{} 'CodeEntry (:doc |)
           :code $ quote $ def dev?
-            = |dev $ option:unwrap-or (get-env |mode) |release
+            = |dev $ .unwrap-or (get-env |mode) |release
           :examples $ []
           :schema $ :: 'Bool
         'site $ %{} 'CodeEntry (:doc |)
@@ -158,7 +160,7 @@
             :features $ #{} :js-ffi
         'mount-target $ %{} 'CodeEntry (:doc |)
           :code $ quote $ def mount-target
-            create-root-host $ option:unwrap $ browser/query-selector |.app
+            create-root-host $ .unwrap $ browser/query-selector |.app
           :examples $ []
           :schema $ :: 'reacher.core/ReactRootHost
         'persist-storage! $ %{} 'CodeEntry (:doc |)
@@ -240,7 +242,10 @@
                 (:some tasks)
                   if (list? tasks)
                     let
-                        decoded-tasks $ map tasks $ fn (data)
+                        decoded-tasks $ .map tasks $ fn (data)
+                          hint-fn $ {}
+                            :return $ :: 'Option 'reacher.app.schema/Task
+                            :args $ [] 'Dynamic
                           assert-type
                             let
                                 candidate $ if (struct? data)
@@ -264,8 +269,17 @@
                                                     Option :none
                                 (:none) (Option :none)
                             :: 'Option 'reacher.app.schema/Task
-                      if (every? decoded-tasks option:some?)
-                        Option :some $ Store :tasks $ assert-type (map decoded-tasks option:unwrap) (:: 'List 'reacher.app.schema/Task)
+                      if
+                        every? decoded-tasks $ fn (task)
+                          hint-fn $ {} (:return 'Bool)
+                            :args $ [] $ :: 'Option 'reacher.app.schema/Task
+                          .some? task
+                        Option :some $ Store :tasks $ assert-type
+                          .map decoded-tasks $ fn (task)
+                            hint-fn $ {} (:return 'reacher.app.schema/Task)
+                              :args $ [] $ :: 'Option 'reacher.app.schema/Task
+                            .unwrap task
+                          :: 'List 'reacher.app.schema/Task
                         Option :none
                     Option :none
                 (:none) (Option :none)
@@ -283,17 +297,17 @@
           :code $ quote $ defn updater (store op op-id op-time)
             match op
               (:add-task text)
-                reacher.app.schema/Store :tasks $ conj (:tasks store)
+                reacher.app.schema/Store :tasks $ .append (:tasks store)
                   reacher.app.schema/Task :id op-id :time op-time :done? false :text text
               (:rm-task task-id)
-                reacher.app.schema/Store :tasks $ filter (:tasks store)
+                reacher.app.schema/Store :tasks $ .filter (:tasks store)
                   fn (task)
                     hint-fn $ {}
                       :args $ [] 'reacher.app.schema/Task
                       :return 'Bool
                     not= task-id $ :id task
               (:toggle-task task-id)
-                reacher.app.schema/Store :tasks $ map (:tasks store)
+                reacher.app.schema/Store :tasks $ .map (:tasks store)
                   fn (task)
                     hint-fn $ {}
                       :args $ [] 'reacher.app.schema/Task
@@ -413,7 +427,9 @@
             :features $ #{} :js-ffi
         'map-strip-keyword $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn map-strip-keyword (xs)
-            map xs $ fn (x)
+            .map xs $ fn (x)
+              hint-fn $ {} (:return 'String)
+                :args $ [] 'Tag
               if (tag? x) (to-string x) x
           :examples $ []
           :schema $ :: 'Fn $ {}
@@ -492,7 +508,7 @@
                     if (= :style k)
                       MapEntryDecision :keep |style $ let
                           s $ decode-map-as
-                            option:unwrap-or (get typed-props :style) ({})
+                            .unwrap-or (get typed-props :style) ({})
                             :: 'Map 'Tag 'Dynamic
                         if (empty? s) | $ -> s
                           filter-map-kv $ fn (style-key style-value)
@@ -678,12 +694,14 @@
         'style->string $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn style->string (styles)
             -> (&map:to-list styles)
-              map $ fn (entry)
+              .map $ fn (entry)
+                hint-fn $ {} (:return 'String)
+                  :args $ [] $ :: 'List 'Dynamic
                 let
-                    k $ option:unwrap $ first entry
+                    k $ .unwrap $ first entry
                     style-name $ reacher.util.str/scalar-string $ decode-map-as k 'Tag
                     v $ dbg $ get-style-value
-                      option:unwrap $ last entry
+                      .unwrap $ last entry
                       dashed->camel style-name
                   str style-name |: (escape-html v) |;
               join-string |

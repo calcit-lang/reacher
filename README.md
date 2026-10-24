@@ -4,8 +4,8 @@ Reacher: React.js in calcit-js
 
 Demo https://repo.calcit-lang.org/reacher/ .
 
-使用者注意：`0.0.8` 候选配对正式 Calcit CLI / `@calcit/procs` **0.30.1**，
-UI 升到 **0.8.0**；请同步完整依赖图、重新生成 JS 并完整刷新页面，不混装旧 alpha。
+使用者注意：本轮保持正式 Calcit CLI / `@calcit/procs` **0.30.1**，
+配对 UI **0.8.1** / JS-FFI **0.2.6**；请同步完整依赖图、重新生成 JS 并完整刷新页面，不混装旧 alpha。
 React 18、公开组件 API、状态/存储格式及 setter 身份不变；UI 基础样式可能变化。
 Demo 先读取/恢复存档，再首次渲染和注册 watch/离页保存：解析抛错时不再留下
 会覆盖原存档的保存回调。合法 EDN 但不符合 Store 的值仍按原逻辑显示 HUD，
@@ -71,9 +71,9 @@ https://github.com/calcit-lang/respo-calcit-workflow
 
 ### Calcit 与 COS/CDN
 
-本轮候选配对正式 Calcit / `@calcit/procs` `0.30.1`；
-模块依赖为已发布的 Respo UI `0.8.0`、JS-FFI `0.2.5`，不新增 alpha
-或 Git hash 模块依赖。传递依赖统一到 Respo `0.16.124`、Router `0.8.37`；
+本轮保持正式 Calcit / `@calcit/procs` `0.30.1`；
+模块依赖为已发布的 Respo UI `0.8.1`、JS-FFI `0.2.6`，不新增 alpha
+或 Git hash 模块依赖。传递依赖统一到 Respo `0.16.126`、Router `0.8.38`；
 CI 使用 `caps --strict --ci` 验证，不再允许版本选择警告。
 CI 检查规范快照、全部定义和现有 FFI 测试，完整 strict 要求 passed 且 diagnostics 为空；
 不再调用硬编码 fix preset 或重复输出类型统计。
@@ -92,8 +92,13 @@ props/style 输入通过实际 Map 解码；标量文本转换通过 `data-view`
 React FFI 强转，不用每次 render 新建的闭包替代。原状态、children、memo、
 事件派发、存储 key 和部署路径不变；非法宿主能力现在在边界提前拒绝。
 不新增验证脚本、框架、强转或类型预算。候选版本号不表示已发布，发版前仍需
-最新 CI/review、真实浏览器和消费者验收。本轮 Snapshot 仅移动 Demo 启动中的原存档恢复
-表达式，原解析、decode/hydrate、HUD 和异常传播不变，不修改 schema、公开 API 或测试。
+最新 CI/review、真实浏览器和消费者验收。本轮清理七处 Option 调用/函数引用及十一处
+Map/List 写法，保留原解析、decode/hydrate、HUD 和异常传播，不修改公开 schema。
+单参数的样式 merge 直接移除；Option 方法作为高阶函数参数时使用具体回调合同，保留 None 短路顺序。
+`map-strip-keyword` 保留原 Tag 转字符串及非 Tag 透传分支，公开
+`List<Tag> -> List<String>` 合同不变；本轮不重新定义混合输入的 API 边界。
+现有 Node FFI 入口保留六项断言，并执行原两项附带测试对应的 Task/Store 互换拒绝案例；
+不新增测试脚本，不把 JS 宿主测试冒充 native 运行。本轮不覆盖旧 tag 或抢先发版。
 正式 Linux CI 不代表所有平台均已验收或均有正式预编译 CLI；本地原 alpha 基线不是正式验收。
 同时将 `defatom`、`turn-string`、`w-log` 改为当前 `defref`、`to-string`、`dbg`，
 将存储解码的 `option:let` 展开为原顺序的 `.and-then`，保留首个 None 时短路。

@@ -38,3 +38,13 @@ assert.throws(
   () => read_task_prop({ task: 42 }),
   /component\.props\.task_expected_Task/,
 );
+
+// Run the two existing attached nominal-type rejection cases on the JS host.
+assert.throws(
+  () => read_store_prop({ store: task }),
+  /component\.props\.store_expected_Store/,
+);
+assert.throws(
+  () => read_task_prop({ task: store }),
+  /component\.props\.task_expected_Task/,
+);
