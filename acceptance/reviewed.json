@@ -1,0 +1,4608 @@
+[
+  {
+    "code": [
+      "def",
+      "calcit-dirname",
+      "|"
+    ],
+    "doc": "",
+    "examples": [],
+    "ffi": null,
+    "ffi_edn": null,
+    "id": "reacher.$meta/calcit-dirname",
+    "js_ffi": null,
+    "schema": null,
+    "tags": [],
+    "tests": []
+  },
+  {
+    "code": [
+      "def",
+      "calcit-filename",
+      "|calcit.cirru"
+    ],
+    "doc": "",
+    "examples": [],
+    "ffi": null,
+    "ffi_edn": null,
+    "id": "reacher.$meta/calcit-filename",
+    "js_ffi": null,
+    "schema": null,
+    "tags": [],
+    "tests": []
+  },
+  {
+    "code": [
+      "defn",
+      "comp-container",
+      [
+        "props",
+        "&",
+        "host-args"
+      ],
+      [
+        "let",
+        [
+          [
+            "store",
+            [
+              "ffi/read-store-prop",
+              "props"
+            ]
+          ],
+          [
+            "*draft",
+            [
+              "use-atom",
+              "|"
+            ]
+          ],
+          [
+            "d!",
+            [
+              "use-dispatch"
+            ]
+          ],
+          [
+            "tasks",
+            [
+              ":tasks",
+              "store"
+            ]
+          ]
+        ],
+        [
+          "div",
+          [
+            "{}",
+            [
+              ":style",
+              [
+                "merge",
+                "ui/global",
+                "ui/column",
+                [
+                  "{}",
+                  [
+                    ":padding",
+                    "|16px"
+                  ]
+                ]
+              ]
+            ]
+          ],
+          [
+            "div",
+            [
+              "{}",
+              [
+                ":style",
+                "ui/row"
+              ]
+            ],
+            [
+              "input",
+              [
+                "{}",
+                [
+                  ":value",
+                  [
+                    ":value",
+                    "*draft"
+                  ]
+                ],
+                [
+                  ":placeholder",
+                  "|Content"
+                ],
+                [
+                  ":style",
+                  [
+                    "merge",
+                    "ui/input"
+                  ]
+                ],
+                [
+                  ":on-change",
+                  [
+                    "fn",
+                    [
+                      "event"
+                    ],
+                    [
+                      "let",
+                      [
+                        [
+                          "setter",
+                          [
+                            ":setter",
+                            "*draft"
+                          ]
+                        ]
+                      ],
+                      [
+                        "setter",
+                        [
+                          "ffi/read-input-value",
+                          "event"
+                        ]
+                      ]
+                    ]
+                  ]
+                ]
+              ]
+            ],
+            [
+              "=<",
+              "8",
+              "0"
+            ],
+            [
+              "button",
+              [
+                "{}",
+                [
+                  ":style",
+                  "ui/button"
+                ],
+                [
+                  ":on-click",
+                  [
+                    "fn",
+                    [
+                      "event"
+                    ],
+                    [
+                      "d!",
+                      [
+                        "schema/Op",
+                        ":add-task",
+                        [
+                          "decode-map-as",
+                          [
+                            ":value",
+                            "*draft"
+                          ],
+                          "'String"
+                        ]
+                      ]
+                    ],
+                    [
+                      "let",
+                      [
+                        [
+                          "setter",
+                          [
+                            ":setter",
+                            "*draft"
+                          ]
+                        ]
+                      ],
+                      [
+                        "setter",
+                        "|"
+                      ]
+                    ]
+                  ]
+                ]
+              ],
+              "|Run"
+            ]
+          ],
+          [
+            "=<",
+            "8",
+            "0"
+          ],
+          [
+            "div",
+            [
+              "{}"
+            ],
+            "&",
+            [
+              "map",
+              "tasks",
+              [
+                "fn",
+                [
+                  "task"
+                ],
+                [
+                  "wrap-comp",
+                  "memod-comp-task",
+                  [
+                    "&js-object",
+                    ":task",
+                    "task",
+                    ":id",
+                    [
+                      ":id",
+                      "task"
+                    ]
+                  ]
+                ]
+              ]
+            ]
+          ]
+        ]
+      ]
+    ],
+    "doc": "",
+    "examples": [],
+    "ffi": null,
+    "ffi_edn": null,
+    "id": "reacher.app.comp.container/comp-container",
+    "js_ffi": null,
+    "schema": [
+      "{}",
+      [
+        ":kind",
+        ":fn"
+      ],
+      [
+        ":rest",
+        "'Dynamic"
+      ],
+      [
+        ":return",
+        "'JsObject"
+      ],
+      [
+        ":args",
+        [
+          "[]",
+          [
+            "::",
+            "'JsNullish",
+            "'JsObject"
+          ]
+        ]
+      ],
+      [
+        ":features",
+        [
+          "#{}",
+          ":js-ffi"
+        ]
+      ]
+    ],
+    "tags": [],
+    "tests": []
+  },
+  {
+    "code": [
+      "defn",
+      "comp-task",
+      [
+        "props",
+        "&",
+        "host-args"
+      ],
+      [
+        "use-effect!",
+        [
+          "[]",
+          [
+            "browser/random"
+          ]
+        ],
+        [
+          "fn",
+          [],
+          [
+            "println",
+            "|effect"
+          ],
+          "&unit"
+        ]
+      ],
+      [
+        "js/console.log",
+        "|task",
+        "props"
+      ],
+      [
+        "let",
+        [
+          [
+            "task",
+            [
+              "ffi/read-task-prop",
+              "props"
+            ]
+          ],
+          [
+            "d!",
+            [
+              "use-dispatch"
+            ]
+          ]
+        ],
+        [
+          "div",
+          [
+            "{}",
+            [
+              ":style",
+              [
+                "merge",
+                "ui/row-middle",
+                [
+                  "{}",
+                  [
+                    ":margin",
+                    ":4px"
+                  ]
+                ]
+              ]
+            ]
+          ],
+          [
+            "div",
+            [
+              "{}",
+              [
+                ":style",
+                [
+                  "{}",
+                  [
+                    ":background-color",
+                    [
+                      "if",
+                      [
+                        ":done?",
+                        "task"
+                      ],
+                      [
+                        "hsl",
+                        "0",
+                        "0",
+                        "80"
+                      ],
+                      ":red"
+                    ]
+                  ],
+                  [
+                    ":width",
+                    "24"
+                  ],
+                  [
+                    ":height",
+                    "24"
+                  ]
+                ]
+              ],
+              [
+                ":on-click",
+                [
+                  "fn",
+                  [
+                    "e"
+                  ],
+                  [
+                    "d!",
+                    [
+                      "schema/Op",
+                      ":toggle-task",
+                      [
+                        ":id",
+                        "task"
+                      ]
+                    ]
+                  ]
+                ]
+              ]
+            ]
+          ],
+          [
+            "=<",
+            "8",
+            "0"
+          ],
+          [
+            "div",
+            [
+              "{}",
+              [
+                ":style",
+                [
+                  "{}",
+                  [
+                    ":min-width",
+                    "200"
+                  ]
+                ]
+              ]
+            ],
+            [
+              ":text",
+              "task"
+            ]
+          ],
+          [
+            "=<",
+            "8",
+            "0"
+          ],
+          [
+            "div",
+            [
+              "{}",
+              [
+                ":on-click",
+                [
+                  "fn",
+                  [
+                    "e"
+                  ],
+                  [
+                    "d!",
+                    [
+                      "schema/Op",
+                      ":rm-task",
+                      [
+                        ":id",
+                        "task"
+                      ]
+                    ]
+                  ]
+                ]
+              ]
+            ],
+            "|rm"
+          ]
+        ]
+      ]
+    ],
+    "doc": "",
+    "examples": [],
+    "ffi": null,
+    "ffi_edn": null,
+    "id": "reacher.app.comp.container/comp-task",
+    "js_ffi": null,
+    "schema": [
+      "{}",
+      [
+        ":kind",
+        ":fn"
+      ],
+      [
+        ":rest",
+        "'Dynamic"
+      ],
+      [
+        ":return",
+        "'JsObject"
+      ],
+      [
+        ":args",
+        [
+          "[]",
+          [
+            "::",
+            "'JsNullish",
+            "'JsObject"
+          ]
+        ]
+      ],
+      [
+        ":features",
+        [
+          "#{}",
+          ":js-ffi"
+        ]
+      ]
+    ],
+    "tags": [],
+    "tests": []
+  },
+  {
+    "code": [
+      "def",
+      "memod-comp-task",
+      [
+        "re-memo",
+        "comp-task"
+      ]
+    ],
+    "doc": "",
+    "examples": [],
+    "ffi": null,
+    "ffi_edn": null,
+    "id": "reacher.app.comp.container/memod-comp-task",
+    "js_ffi": null,
+    "schema": "'JsObject",
+    "tags": [],
+    "tests": []
+  },
+  {
+    "code": [
+      "defstruct",
+      "Site",
+      [
+        ":storage-key",
+        "'String"
+      ]
+    ],
+    "doc": "",
+    "examples": [],
+    "ffi": null,
+    "ffi_edn": null,
+    "id": "reacher.app.config/Site",
+    "js_ffi": null,
+    "schema": "'StructDef",
+    "tags": [],
+    "tests": []
+  },
+  {
+    "code": [
+      "def",
+      "dev?",
+      [
+        "=",
+        "|dev",
+        [
+          "option:unwrap-or",
+          [
+            "get-env",
+            "|mode"
+          ],
+          "|release"
+        ]
+      ]
+    ],
+    "doc": "",
+    "examples": [],
+    "ffi": null,
+    "ffi_edn": null,
+    "id": "reacher.app.config/dev?",
+    "js_ffi": null,
+    "schema": "'Bool",
+    "tags": [],
+    "tests": []
+  },
+  {
+    "code": [
+      "def",
+      "site",
+      [
+        "Site",
+        ":storage-key",
+        "|workflow"
+      ]
+    ],
+    "doc": "",
+    "examples": [],
+    "ffi": null,
+    "ffi_edn": null,
+    "id": "reacher.app.config/site",
+    "js_ffi": null,
+    "schema": "'reacher.app.config/Site",
+    "tags": [],
+    "tests": []
+  },
+  {
+    "code": [
+      "defref",
+      "*store",
+      [
+        "schema/Store",
+        ":tasks",
+        [
+          "[]"
+        ]
+      ]
+    ],
+    "doc": "",
+    "examples": [],
+    "ffi": null,
+    "ffi_edn": null,
+    "id": "reacher.app.main/*store",
+    "js_ffi": null,
+    "schema": [
+      "::",
+      "'Ref",
+      "'reacher.app.schema/Store"
+    ],
+    "tags": [],
+    "tests": []
+  },
+  {
+    "code": [
+      "defn",
+      "create-root-host",
+      [
+        "target"
+      ],
+      [
+        "js-cast",
+        [
+          "createRoot",
+          "target"
+        ],
+        "'reacher.core/ReactRootHost"
+      ]
+    ],
+    "doc": "",
+    "examples": [],
+    "ffi": null,
+    "ffi_edn": null,
+    "id": "reacher.app.main/create-root-host",
+    "js_ffi": null,
+    "schema": [
+      "{}",
+      [
+        ":kind",
+        ":fn"
+      ],
+      [
+        ":return",
+        "'reacher.core/ReactRootHost"
+      ],
+      [
+        ":args",
+        [
+          "[]",
+          "'js-ffi.browser/DomElementHost"
+        ]
+      ],
+      [
+        ":features",
+        [
+          "#{}",
+          ":js-ffi"
+        ]
+      ]
+    ],
+    "tags": [],
+    "tests": []
+  },
+  {
+    "code": [
+      "defn",
+      "dispatch!",
+      [
+        "op"
+      ],
+      [
+        "when",
+        "config/dev?",
+        [
+          "println",
+          "|Dispatch:",
+          "op"
+        ]
+      ],
+      [
+        "let",
+        [
+          [
+            "now",
+            [
+              "shared/date-now-snapshot"
+            ]
+          ]
+        ],
+        [
+          "reset!",
+          "*store",
+          [
+            "updater",
+            "@*store",
+            "op",
+            [
+              "generate-id!"
+            ],
+            [
+              ":timestamp",
+              "now"
+            ]
+          ]
+        ],
+        "&unit"
+      ]
+    ],
+    "doc": "",
+    "examples": [],
+    "ffi": null,
+    "ffi_edn": null,
+    "id": "reacher.app.main/dispatch!",
+    "js_ffi": null,
+    "schema": [
+      "{}",
+      [
+        ":kind",
+        ":fn"
+      ],
+      [
+        ":return",
+        "'Unit"
+      ],
+      [
+        ":args",
+        [
+          "[]",
+          "'reacher.app.schema/Op"
+        ]
+      ],
+      [
+        ":features",
+        [
+          "#{}",
+          ":js-ffi"
+        ]
+      ]
+    ],
+    "tags": [],
+    "tests": []
+  },
+  {
+    "code": [
+      "defn",
+      "main!",
+      [],
+      [
+        "println",
+        "|Running_mode:",
+        [
+          "if",
+          "config/dev?",
+          "|dev",
+          "|release"
+        ]
+      ],
+      [
+        "if",
+        "config/dev?",
+        [
+          "load-console-formatter!"
+        ]
+      ],
+      [
+        "match",
+        [
+          "browser/storage-get",
+          [
+            ":storage-key",
+            "config/site"
+          ]
+        ],
+        [
+          [
+            ":some",
+            "raw"
+          ],
+          [
+            "match",
+            [
+              "schema/decode-store",
+              [
+                "parse-cirru-edn",
+                "raw"
+              ]
+            ],
+            [
+              [
+                ":some",
+                "stored"
+              ],
+              [
+                "dispatch!",
+                [
+                  "schema/Op",
+                  ":hydrate-storage",
+                  "stored"
+                ]
+              ]
+            ],
+            [
+              [
+                ":none"
+              ],
+              [
+                "hud!",
+                "|error",
+                "|Ignored_invalid_saved_state"
+              ]
+            ]
+          ]
+        ],
+        [
+          [
+            ":none"
+          ],
+          "&unit"
+        ]
+      ],
+      [
+        "render-app!"
+      ],
+      [
+        "add-watch!",
+        "*store",
+        ":changes",
+        [
+          "fn",
+          [
+            "s",
+            "prev"
+          ],
+          [
+            "render-app!"
+          ]
+        ]
+      ],
+      [
+        "browser/set-before-unload!",
+        [
+          "fn",
+          [
+            "event"
+          ],
+          [
+            "persist-storage!"
+          ]
+        ]
+      ],
+      [
+        "println",
+        "|App_started."
+      ],
+      "&unit"
+    ],
+    "doc": "",
+    "examples": [],
+    "ffi": null,
+    "ffi_edn": null,
+    "id": "reacher.app.main/main!",
+    "js_ffi": null,
+    "schema": [
+      "{}",
+      [
+        ":kind",
+        ":fn"
+      ],
+      [
+        ":return",
+        "'Unit"
+      ],
+      [
+        ":args",
+        [
+          "[]"
+        ]
+      ],
+      [
+        ":features",
+        [
+          "#{}",
+          ":js-ffi"
+        ]
+      ]
+    ],
+    "tags": [],
+    "tests": []
+  },
+  {
+    "code": [
+      "def",
+      "mount-target",
+      [
+        "create-root-host",
+        [
+          "option:unwrap",
+          [
+            "browser/query-selector",
+            "|.app"
+          ]
+        ]
+      ]
+    ],
+    "doc": "",
+    "examples": [],
+    "ffi": null,
+    "ffi_edn": null,
+    "id": "reacher.app.main/mount-target",
+    "js_ffi": null,
+    "schema": "'reacher.core/ReactRootHost",
+    "tags": [],
+    "tests": []
+  },
+  {
+    "code": [
+      "defn",
+      "persist-storage!",
+      [],
+      [
+        "browser/storage-set!",
+        [
+          ":storage-key",
+          "config/site"
+        ],
+        [
+          "format-cirru-edn",
+          "@*store"
+        ]
+      ]
+    ],
+    "doc": "",
+    "examples": [],
+    "ffi": null,
+    "ffi_edn": null,
+    "id": "reacher.app.main/persist-storage!",
+    "js_ffi": null,
+    "schema": [
+      "{}",
+      [
+        ":kind",
+        ":fn"
+      ],
+      [
+        ":return",
+        "'Unit"
+      ],
+      [
+        ":args",
+        [
+          "[]"
+        ]
+      ],
+      [
+        ":features",
+        [
+          "#{}",
+          ":js-ffi"
+        ]
+      ]
+    ],
+    "tags": [],
+    "tests": []
+  },
+  {
+    "code": [
+      "defn",
+      "reload!",
+      [],
+      [
+        "if",
+        [
+          "nil?",
+          "build-errors"
+        ],
+        [
+          "do",
+          [
+            "remove-watch!",
+            "*store",
+            ":changes"
+          ],
+          [
+            "add-watch!",
+            "*store",
+            ":changes",
+            [
+              "fn",
+              [
+                "s",
+                "prev"
+              ],
+              [
+                "render-app!"
+              ]
+            ]
+          ],
+          [
+            "render-app!"
+          ],
+          [
+            "hud!",
+            "|ok~",
+            "|Ok"
+          ]
+        ],
+        [
+          "hud!",
+          "|error",
+          "build-errors"
+        ]
+      ],
+      "&unit"
+    ],
+    "doc": "",
+    "examples": [],
+    "ffi": null,
+    "ffi_edn": null,
+    "id": "reacher.app.main/reload!",
+    "js_ffi": null,
+    "schema": [
+      "{}",
+      [
+        ":kind",
+        ":fn"
+      ],
+      [
+        ":return",
+        "'Unit"
+      ],
+      [
+        ":args",
+        [
+          "[]"
+        ]
+      ],
+      [
+        ":features",
+        [
+          "#{}",
+          ":js-ffi"
+        ]
+      ]
+    ],
+    "tags": [],
+    "tests": []
+  },
+  {
+    "code": [
+      "defn",
+      "render-app!",
+      [],
+      [
+        "mount-target",
+        ".render!",
+        [
+          "wrap-comp",
+          "dispatch-provider",
+          [
+            "js-object",
+            [
+              "|value",
+              "dispatch!"
+            ]
+          ],
+          [
+            "wrap-comp",
+            "comp-container",
+            [
+              "js-object",
+              [
+                ":store",
+                "@*store"
+              ]
+            ]
+          ]
+        ]
+      ],
+      "&unit"
+    ],
+    "doc": "",
+    "examples": [],
+    "ffi": null,
+    "ffi_edn": null,
+    "id": "reacher.app.main/render-app!",
+    "js_ffi": null,
+    "schema": [
+      "{}",
+      [
+        ":kind",
+        ":fn"
+      ],
+      [
+        ":return",
+        "'Unit"
+      ],
+      [
+        ":args",
+        [
+          "[]"
+        ]
+      ],
+      [
+        ":features",
+        [
+          "#{}",
+          ":js-ffi"
+        ]
+      ]
+    ],
+    "tags": [],
+    "tests": []
+  },
+  {
+    "code": [
+      "defn",
+      "repeat!",
+      [
+        "duration",
+        "cb"
+      ],
+      [
+        "js/setTimeout",
+        [
+          "fn",
+          [],
+          [
+            "cb"
+          ],
+          [
+            "repeat!",
+            [
+              "*",
+              "1000",
+              "duration"
+            ],
+            "cb"
+          ]
+        ],
+        [
+          "*",
+          "1000",
+          "duration"
+        ]
+      ],
+      "&unit"
+    ],
+    "doc": "",
+    "examples": [],
+    "ffi": null,
+    "ffi_edn": null,
+    "id": "reacher.app.main/repeat!",
+    "js_ffi": null,
+    "schema": [
+      "{}",
+      [
+        ":kind",
+        ":fn"
+      ],
+      [
+        ":return",
+        "'Unit"
+      ],
+      [
+        ":args",
+        [
+          "[]",
+          "'Number",
+          [
+            "::",
+            "'Fn",
+            [
+              "{}",
+              [
+                ":return",
+                "'Unit"
+              ],
+              [
+                ":args",
+                [
+                  "[]"
+                ]
+              ]
+            ]
+          ]
+        ]
+      ],
+      [
+        ":features",
+        [
+          "#{}",
+          ":js-ffi"
+        ]
+      ]
+    ],
+    "tags": [],
+    "tests": []
+  },
+  {
+    "code": [
+      "defenum",
+      "Op",
+      [
+        ":add-task",
+        "'String"
+      ],
+      [
+        ":rm-task",
+        "'String"
+      ],
+      [
+        ":toggle-task",
+        "'String"
+      ],
+      [
+        ":hydrate-storage",
+        "'reacher.app.schema/Store"
+      ]
+    ],
+    "doc": "",
+    "examples": [],
+    "ffi": null,
+    "ffi_edn": null,
+    "id": "reacher.app.schema/Op",
+    "js_ffi": null,
+    "schema": "'EnumDef",
+    "tags": [],
+    "tests": []
+  },
+  {
+    "code": [
+      "defstruct",
+      "Store",
+      [
+        ":tasks",
+        [
+          "::",
+          "'List",
+          "'reacher.app.schema/Task"
+        ]
+      ]
+    ],
+    "doc": "",
+    "examples": [],
+    "ffi": null,
+    "ffi_edn": null,
+    "id": "reacher.app.schema/Store",
+    "js_ffi": null,
+    "schema": "'StructDef",
+    "tags": [],
+    "tests": []
+  },
+  {
+    "code": [
+      "defstruct",
+      "Task",
+      [
+        ":id",
+        "'String"
+      ],
+      [
+        ":time",
+        "'Number"
+      ],
+      [
+        ":done?",
+        "'Bool"
+      ],
+      [
+        ":text",
+        "'String"
+      ]
+    ],
+    "doc": "",
+    "examples": [],
+    "ffi": null,
+    "ffi_edn": null,
+    "id": "reacher.app.schema/Task",
+    "js_ffi": null,
+    "schema": "'StructDef",
+    "tags": [],
+    "tests": []
+  },
+  {
+    "code": [
+      "defn",
+      "decode-store",
+      [
+        "data"
+      ],
+      [
+        "if",
+        [
+          "or",
+          [
+            "map?",
+            "data"
+          ],
+          [
+            "struct?",
+            "data"
+          ]
+        ],
+        [
+          "match",
+          [
+            "get",
+            "data",
+            ":tasks"
+          ],
+          [
+            [
+              ":some",
+              "tasks"
+            ],
+            [
+              "if",
+              [
+                "list?",
+                "tasks"
+              ],
+              [
+                "let",
+                [
+                  [
+                    "decoded-tasks",
+                    [
+                      "map",
+                      "tasks",
+                      [
+                        "fn",
+                        [
+                          "data"
+                        ],
+                        [
+                          "assert-type",
+                          [
+                            "let",
+                            [
+                              [
+                                "candidate",
+                                [
+                                  "if",
+                                  [
+                                    "struct?",
+                                    "data"
+                                  ],
+                                  [
+                                    "struct-match",
+                                    "data",
+                                    [
+                                      "Task",
+                                      "task",
+                                      [
+                                        "Option",
+                                        ":some",
+                                        "task"
+                                      ]
+                                    ],
+                                    [
+                                      "_",
+                                      "_",
+                                      [
+                                        "Option",
+                                        ":none"
+                                      ]
+                                    ]
+                                  ],
+                                  [
+                                    "if",
+                                    [
+                                      "map?",
+                                      "data"
+                                    ],
+                                    [
+                                      "Option",
+                                      ":some",
+                                      "data"
+                                    ],
+                                    [
+                                      "Option",
+                                      ":none"
+                                    ]
+                                  ]
+                                ]
+                              ]
+                            ],
+                            [
+                              "match",
+                              "candidate",
+                              [
+                                [
+                                  ":some",
+                                  "value"
+                                ],
+                                [
+                                  ".and-then",
+                                  [
+                                    "get",
+                                    "value",
+                                    ":id"
+                                  ],
+                                  [
+                                    "fn",
+                                    [
+                                      "id"
+                                    ],
+                                    [
+                                      ".and-then",
+                                      [
+                                        "get",
+                                        "value",
+                                        ":time"
+                                      ],
+                                      [
+                                        "fn",
+                                        [
+                                          "time"
+                                        ],
+                                        [
+                                          ".and-then",
+                                          [
+                                            "get",
+                                            "value",
+                                            ":done?"
+                                          ],
+                                          [
+                                            "fn",
+                                            [
+                                              "done?"
+                                            ],
+                                            [
+                                              ".and-then",
+                                              [
+                                                "get",
+                                                "value",
+                                                ":text"
+                                              ],
+                                              [
+                                                "fn",
+                                                [
+                                                  "text"
+                                                ],
+                                                [
+                                                  "if",
+                                                  [
+                                                    "and",
+                                                    [
+                                                      "string?",
+                                                      "id"
+                                                    ],
+                                                    [
+                                                      "number?",
+                                                      "time"
+                                                    ],
+                                                    [
+                                                      "bool?",
+                                                      "done?"
+                                                    ],
+                                                    [
+                                                      "string?",
+                                                      "text"
+                                                    ]
+                                                  ],
+                                                  [
+                                                    "Option",
+                                                    ":some",
+                                                    [
+                                                      "Task",
+                                                      ":id",
+                                                      "id",
+                                                      ":time",
+                                                      "time",
+                                                      ":done?",
+                                                      "done?",
+                                                      ":text",
+                                                      "text"
+                                                    ]
+                                                  ],
+                                                  [
+                                                    "Option",
+                                                    ":none"
+                                                  ]
+                                                ]
+                                              ]
+                                            ]
+                                          ]
+                                        ]
+                                      ]
+                                    ]
+                                  ]
+                                ]
+                              ],
+                              [
+                                [
+                                  ":none"
+                                ],
+                                [
+                                  "Option",
+                                  ":none"
+                                ]
+                              ]
+                            ]
+                          ],
+                          [
+                            "::",
+                            "'Option",
+                            "'reacher.app.schema/Task"
+                          ]
+                        ]
+                      ]
+                    ]
+                  ]
+                ],
+                [
+                  "if",
+                  [
+                    "every?",
+                    "decoded-tasks",
+                    "option:some?"
+                  ],
+                  [
+                    "Option",
+                    ":some",
+                    [
+                      "Store",
+                      ":tasks",
+                      [
+                        "assert-type",
+                        [
+                          "map",
+                          "decoded-tasks",
+                          "option:unwrap"
+                        ],
+                        [
+                          "::",
+                          "'List",
+                          "'reacher.app.schema/Task"
+                        ]
+                      ]
+                    ]
+                  ],
+                  [
+                    "Option",
+                    ":none"
+                  ]
+                ]
+              ],
+              [
+                "Option",
+                ":none"
+              ]
+            ]
+          ],
+          [
+            [
+              ":none"
+            ],
+            [
+              "Option",
+              ":none"
+            ]
+          ]
+        ],
+        [
+          "Option",
+          ":none"
+        ]
+      ]
+    ],
+    "doc": "",
+    "examples": [],
+    "ffi": null,
+    "ffi_edn": null,
+    "id": "reacher.app.schema/decode-store",
+    "js_ffi": null,
+    "schema": [
+      "{}",
+      [
+        ":kind",
+        ":fn"
+      ],
+      [
+        ":args",
+        [
+          "[]",
+          "'Dynamic"
+        ]
+      ],
+      [
+        ":features",
+        [
+          "#{}",
+          ":js-ffi"
+        ]
+      ],
+      [
+        ":return",
+        [
+          "::",
+          "'Option",
+          "'reacher.app.schema/Store"
+        ]
+      ]
+    ],
+    "tags": [],
+    "tests": []
+  },
+  {
+    "code": [
+      "defn",
+      "updater",
+      [
+        "store",
+        "op",
+        "op-id",
+        "op-time"
+      ],
+      [
+        "match",
+        "op",
+        [
+          [
+            ":add-task",
+            "text"
+          ],
+          [
+            "reacher.app.schema/Store",
+            ":tasks",
+            [
+              "conj",
+              [
+                ":tasks",
+                "store"
+              ],
+              [
+                "reacher.app.schema/Task",
+                ":id",
+                "op-id",
+                ":time",
+                "op-time",
+                ":done?",
+                "false",
+                ":text",
+                "text"
+              ]
+            ]
+          ]
+        ],
+        [
+          [
+            ":rm-task",
+            "task-id"
+          ],
+          [
+            "reacher.app.schema/Store",
+            ":tasks",
+            [
+              "filter",
+              [
+                ":tasks",
+                "store"
+              ],
+              [
+                "fn",
+                [
+                  "task"
+                ],
+                [
+                  "hint-fn",
+                  [
+                    "{}",
+                    [
+                      ":args",
+                      [
+                        "[]",
+                        "'reacher.app.schema/Task"
+                      ]
+                    ],
+                    [
+                      ":return",
+                      "'Bool"
+                    ]
+                  ]
+                ],
+                [
+                  "not=",
+                  "task-id",
+                  [
+                    ":id",
+                    "task"
+                  ]
+                ]
+              ]
+            ]
+          ]
+        ],
+        [
+          [
+            ":toggle-task",
+            "task-id"
+          ],
+          [
+            "reacher.app.schema/Store",
+            ":tasks",
+            [
+              "map",
+              [
+                ":tasks",
+                "store"
+              ],
+              [
+                "fn",
+                [
+                  "task"
+                ],
+                [
+                  "hint-fn",
+                  [
+                    "{}",
+                    [
+                      ":args",
+                      [
+                        "[]",
+                        "'reacher.app.schema/Task"
+                      ]
+                    ],
+                    [
+                      ":return",
+                      "'reacher.app.schema/Task"
+                    ]
+                  ]
+                ],
+                [
+                  "if",
+                  [
+                    "=",
+                    "task-id",
+                    [
+                      ":id",
+                      "task"
+                    ]
+                  ],
+                  [
+                    "update",
+                    "task",
+                    ":done?",
+                    "not"
+                  ],
+                  "task"
+                ]
+              ]
+            ]
+          ]
+        ],
+        [
+          [
+            ":hydrate-storage",
+            "data"
+          ],
+          "data"
+        ]
+      ]
+    ],
+    "doc": "",
+    "examples": [],
+    "ffi": null,
+    "ffi_edn": null,
+    "id": "reacher.app.updater/updater",
+    "js_ffi": null,
+    "schema": [
+      "{}",
+      [
+        ":kind",
+        ":fn"
+      ],
+      [
+        ":return",
+        "'reacher.app.schema/Store"
+      ],
+      [
+        ":args",
+        [
+          "[]",
+          "'reacher.app.schema/Store",
+          "'reacher.app.schema/Op",
+          "'String",
+          "'Number"
+        ]
+      ]
+    ],
+    "tags": [],
+    "tests": []
+  },
+  {
+    "code": [
+      "defn",
+      "=<",
+      [
+        "w",
+        "h"
+      ],
+      [
+        "js-ffi.contract/expect-object",
+        "|React.=<",
+        [
+          "if",
+          [
+            "number?",
+            "w"
+          ],
+          [
+            "React/createElement",
+            "|div",
+            [
+              "js-object",
+              [
+                "|style",
+                [
+                  "js-object",
+                  [
+                    "|width",
+                    "w"
+                  ]
+                ]
+              ]
+            ]
+          ],
+          [
+            "React/createElement",
+            "|div",
+            [
+              "js-object",
+              [
+                "|style",
+                [
+                  "js-object",
+                  [
+                    "|height",
+                    "h"
+                  ]
+                ]
+              ]
+            ]
+          ]
+        ]
+      ]
+    ],
+    "doc": "",
+    "examples": [],
+    "ffi": null,
+    "ffi_edn": null,
+    "id": "reacher.core/=<",
+    "js_ffi": null,
+    "schema": [
+      "{}",
+      [
+        ":kind",
+        ":fn"
+      ],
+      [
+        ":return",
+        "'JsObject"
+      ],
+      [
+        ":args",
+        [
+          "[]",
+          "'Dynamic",
+          "'Dynamic"
+        ]
+      ],
+      [
+        ":features",
+        [
+          "#{}",
+          ":js-ffi"
+        ]
+      ]
+    ],
+    "tags": [],
+    "tests": []
+  },
+  {
+    "code": [
+      "deftrait",
+      "JsKeyArrayHost",
+      [
+        ":length",
+        "'Number"
+      ],
+      [
+        ".includes",
+        [
+          "::",
+          "'Fn",
+          [
+            "{}",
+            [
+              ":args",
+              [
+                "[]",
+                "'reacher.core/JsKeyArrayHost",
+                "'String"
+              ]
+            ],
+            [
+              ":return",
+              "'Bool"
+            ]
+          ]
+        ]
+      ],
+      [
+        ".every",
+        [
+          "::",
+          "'Fn",
+          [
+            "{}",
+            [
+              ":args",
+              [
+                "[]",
+                "'reacher.core/JsKeyArrayHost",
+                [
+                  "::",
+                  "'Fn",
+                  [
+                    "{}",
+                    [
+                      ":args",
+                      [
+                        "[]",
+                        "'String",
+                        "'Number",
+                        "'reacher.core/JsKeyArrayHost"
+                      ]
+                    ],
+                    [
+                      ":return",
+                      "'Bool"
+                    ]
+                  ]
+                ]
+              ]
+            ],
+            [
+              ":return",
+              "'Bool"
+            ]
+          ]
+        ]
+      ]
+    ],
+    "doc": "",
+    "examples": [],
+    "ffi": {
+      ":backend": {
+        "__edn_tag": "js"
+      },
+      ":kind": {
+        "__edn_tag": "external-object"
+      },
+      ":names": {
+        ":every": "every",
+        ":includes": "includes"
+      },
+      ":target": {
+        "__edn_tag": "browser"
+      }
+    },
+    "ffi_edn": "{} (:backend :js) (:kind :external-object) (:target :browser)\n  :names $ {} (:every |every) (:includes |includes)",
+    "id": "reacher.core/JsKeyArrayHost",
+    "js_ffi": null,
+    "schema": "'Trait",
+    "tags": [],
+    "tests": []
+  },
+  {
+    "code": [
+      "deftrait",
+      "ReactRootHost",
+      [
+        ".render!",
+        [
+          "::",
+          "'Fn",
+          [
+            "{}",
+            [
+              ":args",
+              [
+                "[]",
+                "'reacher.core/ReactRootHost",
+                "'JsObject"
+              ]
+            ],
+            [
+              ":return",
+              "'Unit"
+            ]
+          ]
+        ]
+      ]
+    ],
+    "doc": "",
+    "examples": [],
+    "ffi": {
+      ":backend": {
+        "__edn_tag": "js"
+      },
+      ":kind": {
+        "__edn_tag": "external-object"
+      },
+      ":names": {
+        ":render!": "render"
+      },
+      ":target": {
+        "__edn_tag": "browser"
+      }
+    },
+    "ffi_edn": "{} (:backend :js) (:kind :external-object) (:target :browser)\n  :names $ {} $ :render! |render",
+    "id": "reacher.core/ReactRootHost",
+    "js_ffi": null,
+    "schema": "'Trait",
+    "tags": [],
+    "tests": []
+  },
+  {
+    "code": [
+      "defstruct",
+      "StateRef",
+      [
+        ":value",
+        "'Dynamic"
+      ],
+      [
+        ":setter",
+        [
+          "::",
+          "'Fn",
+          [
+            "{}",
+            [
+              ":args",
+              [
+                "[]",
+                "'Dynamic"
+              ]
+            ],
+            [
+              ":return",
+              "'Unit"
+            ]
+          ]
+        ]
+      ]
+    ],
+    "doc": "",
+    "examples": [],
+    "ffi": null,
+    "ffi_edn": null,
+    "id": "reacher.core/StateRef",
+    "js_ffi": null,
+    "schema": "'StructDef",
+    "tags": [],
+    "tests": []
+  },
+  {
+    "code": [
+      "defn",
+      "a",
+      [
+        "props",
+        "&",
+        "children"
+      ],
+      [
+        "create-element",
+        "|a",
+        "props",
+        "children"
+      ]
+    ],
+    "doc": "",
+    "examples": [],
+    "ffi": null,
+    "ffi_edn": null,
+    "id": "reacher.core/a",
+    "js_ffi": null,
+    "schema": [
+      "{}",
+      [
+        ":kind",
+        ":fn"
+      ],
+      [
+        ":rest",
+        "'Dynamic"
+      ],
+      [
+        ":return",
+        "'JsObject"
+      ],
+      [
+        ":args",
+        [
+          "[]",
+          "'Dynamic"
+        ]
+      ],
+      [
+        ":features",
+        [
+          "#{}",
+          ":js-ffi"
+        ]
+      ]
+    ],
+    "tags": [],
+    "tests": []
+  },
+  {
+    "code": [
+      "defn",
+      "button",
+      [
+        "props",
+        "&",
+        "children"
+      ],
+      [
+        "create-element",
+        "|button",
+        "props",
+        "children"
+      ]
+    ],
+    "doc": "",
+    "examples": [],
+    "ffi": null,
+    "ffi_edn": null,
+    "id": "reacher.core/button",
+    "js_ffi": null,
+    "schema": [
+      "{}",
+      [
+        ":kind",
+        ":fn"
+      ],
+      [
+        ":rest",
+        "'Dynamic"
+      ],
+      [
+        ":return",
+        "'JsObject"
+      ],
+      [
+        ":args",
+        [
+          "[]",
+          "'Dynamic"
+        ]
+      ],
+      [
+        ":features",
+        [
+          "#{}",
+          ":js-ffi"
+        ]
+      ]
+    ],
+    "tags": [],
+    "tests": []
+  },
+  {
+    "code": [
+      "defn",
+      "canvas",
+      [
+        "props",
+        "&",
+        "children"
+      ],
+      [
+        "create-element",
+        "|div",
+        "props",
+        "children"
+      ]
+    ],
+    "doc": "",
+    "examples": [],
+    "ffi": null,
+    "ffi_edn": null,
+    "id": "reacher.core/canvas",
+    "js_ffi": null,
+    "schema": [
+      "{}",
+      [
+        ":kind",
+        ":fn"
+      ],
+      [
+        ":rest",
+        "'Dynamic"
+      ],
+      [
+        ":return",
+        "'JsObject"
+      ],
+      [
+        ":args",
+        [
+          "[]",
+          "'Dynamic"
+        ]
+      ],
+      [
+        ":features",
+        [
+          "#{}",
+          ":js-ffi"
+        ]
+      ]
+    ],
+    "tags": [],
+    "tests": []
+  },
+  {
+    "code": [
+      "def",
+      "context-of-dispatch",
+      [
+        "create-dispatch-context"
+      ]
+    ],
+    "doc": "",
+    "examples": [],
+    "ffi": null,
+    "ffi_edn": null,
+    "id": "reacher.core/context-of-dispatch",
+    "js_ffi": null,
+    "schema": "'JsObject",
+    "tags": [],
+    "tests": []
+  },
+  {
+    "code": [
+      "defn",
+      "create-dispatch-context",
+      [],
+      [
+        "contract/expect-object",
+        "|React.createContext",
+        [
+          "React/createContext",
+          [
+            "fn",
+            [
+              "op"
+            ],
+            [
+              "println",
+              "|missing_dispatch_function",
+              "op"
+            ]
+          ]
+        ]
+      ]
+    ],
+    "doc": "",
+    "examples": [],
+    "ffi": null,
+    "ffi_edn": null,
+    "id": "reacher.core/create-dispatch-context",
+    "js_ffi": null,
+    "schema": [
+      "{}",
+      [
+        ":kind",
+        ":fn"
+      ],
+      [
+        ":return",
+        "'JsObject"
+      ],
+      [
+        ":args",
+        [
+          "[]"
+        ]
+      ],
+      [
+        ":features",
+        [
+          "#{}",
+          ":js-ffi"
+        ]
+      ]
+    ],
+    "tags": [],
+    "tests": []
+  },
+  {
+    "code": [
+      "defn",
+      "create-element",
+      [
+        "tag",
+        "props",
+        "children"
+      ],
+      [
+        "js-ffi.contract/expect-object",
+        "|React.create-element",
+        [
+          "React/createElement",
+          [
+            "reacher.util.str/scalar-string",
+            "tag"
+          ],
+          [
+            "transform-props",
+            "props"
+          ],
+          "&",
+          "children"
+        ]
+      ]
+    ],
+    "doc": "",
+    "examples": [],
+    "ffi": null,
+    "ffi_edn": null,
+    "id": "reacher.core/create-element",
+    "js_ffi": null,
+    "schema": [
+      "{}",
+      [
+        ":kind",
+        ":fn"
+      ],
+      [
+        ":return",
+        "'JsObject"
+      ],
+      [
+        ":args",
+        [
+          "[]",
+          "'Dynamic",
+          "'Dynamic",
+          [
+            "::",
+            "'List",
+            "'Dynamic"
+          ]
+        ]
+      ],
+      [
+        ":features",
+        [
+          "#{}",
+          ":js-ffi"
+        ]
+      ]
+    ],
+    "tags": [],
+    "tests": []
+  },
+  {
+    "code": [
+      "def",
+      "dispatch-provider",
+      [
+        "contract/expect-object",
+        "|React.Context.Provider",
+        [
+          "contract/object-field",
+          "|React.Context",
+          "context-of-dispatch",
+          "|Provider"
+        ]
+      ]
+    ],
+    "doc": "",
+    "examples": [],
+    "ffi": null,
+    "ffi_edn": null,
+    "id": "reacher.core/dispatch-provider",
+    "js_ffi": null,
+    "schema": "'JsObject",
+    "tags": [],
+    "tests": []
+  },
+  {
+    "code": [
+      "defn",
+      "div",
+      [
+        "props",
+        "&",
+        "children"
+      ],
+      [
+        "create-element",
+        "|div",
+        "props",
+        "children"
+      ]
+    ],
+    "doc": "",
+    "examples": [],
+    "ffi": null,
+    "ffi_edn": null,
+    "id": "reacher.core/div",
+    "js_ffi": null,
+    "schema": [
+      "{}",
+      [
+        ":kind",
+        ":fn"
+      ],
+      [
+        ":rest",
+        "'Dynamic"
+      ],
+      [
+        ":return",
+        "'JsObject"
+      ],
+      [
+        ":args",
+        [
+          "[]",
+          "'Dynamic"
+        ]
+      ],
+      [
+        ":features",
+        [
+          "#{}",
+          ":js-ffi"
+        ]
+      ]
+    ],
+    "tags": [],
+    "tests": []
+  },
+  {
+    "code": [
+      "defn",
+      "img",
+      [
+        "props",
+        "&",
+        "children"
+      ],
+      [
+        "create-element",
+        "|img",
+        "props",
+        "children"
+      ]
+    ],
+    "doc": "",
+    "examples": [],
+    "ffi": null,
+    "ffi_edn": null,
+    "id": "reacher.core/img",
+    "js_ffi": null,
+    "schema": [
+      "{}",
+      [
+        ":kind",
+        ":fn"
+      ],
+      [
+        ":rest",
+        "'Dynamic"
+      ],
+      [
+        ":return",
+        "'JsObject"
+      ],
+      [
+        ":args",
+        [
+          "[]",
+          "'Dynamic"
+        ]
+      ],
+      [
+        ":features",
+        [
+          "#{}",
+          ":js-ffi"
+        ]
+      ]
+    ],
+    "tags": [],
+    "tests": []
+  },
+  {
+    "code": [
+      "defn",
+      "input",
+      [
+        "props",
+        "&",
+        "children"
+      ],
+      [
+        "create-element",
+        "|input",
+        "props",
+        "children"
+      ]
+    ],
+    "doc": "",
+    "examples": [],
+    "ffi": null,
+    "ffi_edn": null,
+    "id": "reacher.core/input",
+    "js_ffi": null,
+    "schema": [
+      "{}",
+      [
+        ":kind",
+        ":fn"
+      ],
+      [
+        ":rest",
+        "'Dynamic"
+      ],
+      [
+        ":return",
+        "'JsObject"
+      ],
+      [
+        ":args",
+        [
+          "[]",
+          "'Dynamic"
+        ]
+      ],
+      [
+        ":features",
+        [
+          "#{}",
+          ":js-ffi"
+        ]
+      ]
+    ],
+    "tags": [],
+    "tests": []
+  },
+  {
+    "code": [
+      "defn",
+      "map-strip-keyword",
+      [
+        "xs"
+      ],
+      [
+        "map",
+        "xs",
+        [
+          "fn",
+          [
+            "x"
+          ],
+          [
+            "if",
+            [
+              "tag?",
+              "x"
+            ],
+            [
+              "to-string",
+              "x"
+            ],
+            "x"
+          ]
+        ]
+      ]
+    ],
+    "doc": "",
+    "examples": [],
+    "ffi": null,
+    "ffi_edn": null,
+    "id": "reacher.core/map-strip-keyword",
+    "js_ffi": null,
+    "schema": [
+      "{}",
+      [
+        ":kind",
+        ":fn"
+      ],
+      [
+        ":args",
+        [
+          "[]",
+          [
+            "::",
+            "'List",
+            "'Tag"
+          ]
+        ]
+      ],
+      [
+        ":return",
+        [
+          "::",
+          "'List",
+          "'String"
+        ]
+      ]
+    ],
+    "tags": [],
+    "tests": []
+  },
+  {
+    "code": [
+      "defn",
+      "object-keys-host",
+      [
+        "value"
+      ],
+      [
+        "js-cast",
+        [
+          "js/Object.keys",
+          "value"
+        ],
+        "'reacher.core/JsKeyArrayHost"
+      ]
+    ],
+    "doc": "",
+    "examples": [],
+    "ffi": null,
+    "ffi_edn": null,
+    "id": "reacher.core/object-keys-host",
+    "js_ffi": null,
+    "schema": [
+      "{}",
+      [
+        ":kind",
+        ":fn"
+      ],
+      [
+        ":return",
+        "'reacher.core/JsKeyArrayHost"
+      ],
+      [
+        ":args",
+        [
+          "[]",
+          "'JsObject"
+        ]
+      ],
+      [
+        ":features",
+        [
+          "#{}",
+          ":js-ffi"
+        ]
+      ]
+    ],
+    "tags": [],
+    "tests": []
+  },
+  {
+    "code": [
+      "defn",
+      "pre",
+      [
+        "props",
+        "&",
+        "children"
+      ],
+      [
+        "create-element",
+        "|pre",
+        "props",
+        "children"
+      ]
+    ],
+    "doc": "",
+    "examples": [],
+    "ffi": null,
+    "ffi_edn": null,
+    "id": "reacher.core/pre",
+    "js_ffi": null,
+    "schema": [
+      "{}",
+      [
+        ":kind",
+        ":fn"
+      ],
+      [
+        ":rest",
+        "'Dynamic"
+      ],
+      [
+        ":return",
+        "'JsObject"
+      ],
+      [
+        ":args",
+        [
+          "[]",
+          "'Dynamic"
+        ]
+      ],
+      [
+        ":features",
+        [
+          "#{}",
+          ":js-ffi"
+        ]
+      ]
+    ],
+    "tags": [],
+    "tests": []
+  },
+  {
+    "code": [
+      "defn",
+      "props-equal",
+      [
+        "prev",
+        "next"
+      ],
+      [
+        "let",
+        [
+          [
+            "p-fields",
+            [
+              "object-keys-host",
+              "prev"
+            ]
+          ],
+          [
+            "n-fields",
+            [
+              "object-keys-host",
+              "next"
+            ]
+          ]
+        ],
+        [
+          "if",
+          [
+            "=",
+            [
+              "p-fields",
+              ":length"
+            ],
+            [
+              "n-fields",
+              ":length"
+            ]
+          ],
+          [
+            "p-fields",
+            ".every",
+            [
+              "fn",
+              [
+                "k",
+                "idx",
+                "parent"
+              ],
+              [
+                "and",
+                [
+                  "n-fields",
+                  ".includes",
+                  "k"
+                ],
+                [
+                  "=",
+                  [
+                    "aget",
+                    "prev",
+                    "k"
+                  ],
+                  [
+                    "aget",
+                    "next",
+                    "k"
+                  ]
+                ]
+              ]
+            ]
+          ],
+          "false"
+        ]
+      ]
+    ],
+    "doc": "",
+    "examples": [],
+    "ffi": null,
+    "ffi_edn": null,
+    "id": "reacher.core/props-equal",
+    "js_ffi": null,
+    "schema": [
+      "{}",
+      [
+        ":kind",
+        ":fn"
+      ],
+      [
+        ":return",
+        "'Bool"
+      ],
+      [
+        ":args",
+        [
+          "[]",
+          "'JsObject",
+          "'JsObject"
+        ]
+      ],
+      [
+        ":features",
+        [
+          "#{}",
+          ":js-ffi"
+        ]
+      ]
+    ],
+    "tags": [],
+    "tests": []
+  },
+  {
+    "code": [
+      "defn",
+      "re-memo",
+      [
+        "c"
+      ],
+      [
+        "js-ffi.contract/expect-object",
+        "|React.re-memo",
+        [
+          "React/memo",
+          "c",
+          "props-equal"
+        ]
+      ]
+    ],
+    "doc": "",
+    "examples": [],
+    "ffi": null,
+    "ffi_edn": null,
+    "id": "reacher.core/re-memo",
+    "js_ffi": null,
+    "schema": [
+      "{}",
+      [
+        ":kind",
+        ":fn"
+      ],
+      [
+        ":return",
+        "'JsObject"
+      ],
+      [
+        ":args",
+        [
+          "[]",
+          "'Fn"
+        ]
+      ],
+      [
+        ":features",
+        [
+          "#{}",
+          ":js-ffi"
+        ]
+      ]
+    ],
+    "tags": [],
+    "tests": []
+  },
+  {
+    "code": [
+      "defn",
+      "render!",
+      [
+        "target",
+        "el"
+      ],
+      [
+        "ReactDOM/render",
+        "el",
+        "target"
+      ],
+      "&unit"
+    ],
+    "doc": "",
+    "examples": [],
+    "ffi": null,
+    "ffi_edn": null,
+    "id": "reacher.core/render!",
+    "js_ffi": null,
+    "schema": [
+      "{}",
+      [
+        ":kind",
+        ":fn"
+      ],
+      [
+        ":return",
+        "'Unit"
+      ],
+      [
+        ":args",
+        [
+          "[]",
+          "'JsObject",
+          "'JsObject"
+        ]
+      ],
+      [
+        ":features",
+        [
+          "#{}",
+          ":js-ffi"
+        ]
+      ]
+    ],
+    "tags": [],
+    "tests": []
+  },
+  {
+    "code": [
+      "defn",
+      "span",
+      [
+        "props",
+        "&",
+        "children"
+      ],
+      [
+        "create-element",
+        "|span",
+        "props",
+        "children"
+      ]
+    ],
+    "doc": "",
+    "examples": [],
+    "ffi": null,
+    "ffi_edn": null,
+    "id": "reacher.core/span",
+    "js_ffi": null,
+    "schema": [
+      "{}",
+      [
+        ":kind",
+        ":fn"
+      ],
+      [
+        ":rest",
+        "'Dynamic"
+      ],
+      [
+        ":return",
+        "'JsObject"
+      ],
+      [
+        ":args",
+        [
+          "[]",
+          "'Dynamic"
+        ]
+      ],
+      [
+        ":features",
+        [
+          "#{}",
+          ":js-ffi"
+        ]
+      ]
+    ],
+    "tags": [],
+    "tests": []
+  },
+  {
+    "code": [
+      "defn",
+      "tag*",
+      [
+        "name",
+        "props",
+        "&",
+        "children"
+      ],
+      [
+        "create-element",
+        [
+          "reacher.util.str/scalar-string",
+          "name"
+        ],
+        "props",
+        "children"
+      ]
+    ],
+    "doc": "",
+    "examples": [],
+    "ffi": null,
+    "ffi_edn": null,
+    "id": "reacher.core/tag*",
+    "js_ffi": null,
+    "schema": [
+      "{}",
+      [
+        ":kind",
+        ":fn"
+      ],
+      [
+        ":rest",
+        "'Dynamic"
+      ],
+      [
+        ":return",
+        "'JsObject"
+      ],
+      [
+        ":args",
+        [
+          "[]",
+          "'Dynamic",
+          "'Dynamic"
+        ]
+      ],
+      [
+        ":features",
+        [
+          "#{}",
+          ":js-ffi"
+        ]
+      ]
+    ],
+    "tags": [],
+    "tests": []
+  },
+  {
+    "code": [
+      "defn",
+      "textarea",
+      [
+        "props",
+        "&",
+        "children"
+      ],
+      [
+        "create-element",
+        "|textarea",
+        "props",
+        "children"
+      ]
+    ],
+    "doc": "",
+    "examples": [],
+    "ffi": null,
+    "ffi_edn": null,
+    "id": "reacher.core/textarea",
+    "js_ffi": null,
+    "schema": [
+      "{}",
+      [
+        ":kind",
+        ":fn"
+      ],
+      [
+        ":rest",
+        "'Dynamic"
+      ],
+      [
+        ":return",
+        "'JsObject"
+      ],
+      [
+        ":args",
+        [
+          "[]",
+          "'Dynamic"
+        ]
+      ],
+      [
+        ":features",
+        [
+          "#{}",
+          ":js-ffi"
+        ]
+      ]
+    ],
+    "tags": [],
+    "tests": []
+  },
+  {
+    "code": [
+      "defn",
+      "transform-props",
+      [
+        "props"
+      ],
+      [
+        "js-ffi.contract/expect-object",
+        "|React.transform-props",
+        [
+          "if",
+          [
+            "nil?",
+            "props"
+          ],
+          [
+            "&js-object"
+          ],
+          [
+            "let",
+            [
+              [
+                "typed-props",
+                [
+                  "decode-map-as",
+                  "props",
+                  [
+                    "::",
+                    "'Map",
+                    "'Tag",
+                    "'Dynamic"
+                  ]
+                ]
+              ]
+            ],
+            [
+              "->",
+              "typed-props",
+              [
+                "filter-map-kv",
+                [
+                  "fn",
+                  [
+                    "k",
+                    "v"
+                  ],
+                  [
+                    "hint-fn",
+                    [
+                      "{}",
+                      [
+                        ":args",
+                        [
+                          "[]",
+                          "'Tag",
+                          "'Dynamic"
+                        ]
+                      ],
+                      [
+                        ":return",
+                        [
+                          "::",
+                          "'MapEntryDecision",
+                          "'String",
+                          "'Dynamic"
+                        ]
+                      ]
+                    ]
+                  ],
+                  [
+                    "if",
+                    [
+                      "=",
+                      ":style",
+                      "k"
+                    ],
+                    [
+                      "MapEntryDecision",
+                      ":keep",
+                      "|style",
+                      [
+                        "let",
+                        [
+                          [
+                            "s",
+                            [
+                              "decode-map-as",
+                              [
+                                "option:unwrap-or",
+                                [
+                                  "get",
+                                  "typed-props",
+                                  ":style"
+                                ],
+                                [
+                                  "{}"
+                                ]
+                              ],
+                              [
+                                "::",
+                                "'Map",
+                                "'Tag",
+                                "'Dynamic"
+                              ]
+                            ]
+                          ]
+                        ],
+                        [
+                          "if",
+                          [
+                            "empty?",
+                            "s"
+                          ],
+                          "|",
+                          [
+                            "->",
+                            "s",
+                            [
+                              "filter-map-kv",
+                              [
+                                "fn",
+                                [
+                                  "style-key",
+                                  "style-value"
+                                ],
+                                [
+                                  "hint-fn",
+                                  [
+                                    "{}",
+                                    [
+                                      ":args",
+                                      [
+                                        "[]",
+                                        "'Tag",
+                                        "'Dynamic"
+                                      ]
+                                    ],
+                                    [
+                                      ":return",
+                                      [
+                                        "::",
+                                        "'MapEntryDecision",
+                                        "'String",
+                                        "'String"
+                                      ]
+                                    ]
+                                  ]
+                                ],
+                                [
+                                  "let",
+                                  [
+                                    [
+                                      "prop",
+                                      [
+                                        "dashed->camel",
+                                        [
+                                          "reacher.util.str/scalar-string",
+                                          "style-key"
+                                        ]
+                                      ]
+                                    ]
+                                  ],
+                                  [
+                                    "MapEntryDecision",
+                                    ":keep",
+                                    "prop",
+                                    [
+                                      "get-style-value",
+                                      "style-value",
+                                      "prop"
+                                    ]
+                                  ]
+                                ]
+                              ]
+                            ],
+                            [
+                              "to-js-data"
+                            ]
+                          ]
+                        ]
+                      ]
+                    ],
+                    [
+                      "MapEntryDecision",
+                      ":keep",
+                      [
+                        "dashed->camel",
+                        [
+                          "reacher.util.str/scalar-string",
+                          "k"
+                        ]
+                      ],
+                      [
+                        "if",
+                        [
+                          "fn?",
+                          "v"
+                        ],
+                        "v",
+                        [
+                          "reacher.util.str/scalar-string",
+                          "v"
+                        ]
+                      ]
+                    ]
+                  ]
+                ]
+              ],
+              [
+                "to-js-data"
+              ]
+            ]
+          ]
+        ]
+      ]
+    ],
+    "doc": "",
+    "examples": [],
+    "ffi": null,
+    "ffi_edn": null,
+    "id": "reacher.core/transform-props",
+    "js_ffi": null,
+    "schema": [
+      "{}",
+      [
+        ":kind",
+        ":fn"
+      ],
+      [
+        ":return",
+        "'JsObject"
+      ],
+      [
+        ":args",
+        [
+          "[]",
+          "'Dynamic"
+        ]
+      ],
+      [
+        ":features",
+        [
+          "#{}",
+          ":js-ffi"
+        ]
+      ]
+    ],
+    "tags": [],
+    "tests": []
+  },
+  {
+    "code": [
+      "defn",
+      "use-atom",
+      [
+        "v"
+      ],
+      [
+        "let",
+        [
+          [
+            "xs",
+            [
+              "contract/expect-object",
+              "|React.useState",
+              [
+                "React/useState",
+                "v"
+              ]
+            ]
+          ],
+          [
+            "state",
+            [
+              "aget",
+              "xs",
+              "0"
+            ]
+          ],
+          [
+            "setter",
+            [
+              "unsafe-coerce",
+              [
+                "contract/expect-function",
+                "|React.useState[1]",
+                [
+                  "aget",
+                  "xs",
+                  "1"
+                ]
+              ],
+              [
+                "::",
+                "'Fn",
+                [
+                  "{}",
+                  [
+                    ":args",
+                    [
+                      "[]",
+                      "'Dynamic"
+                    ]
+                  ],
+                  [
+                    ":return",
+                    "'Unit"
+                  ]
+                ]
+              ]
+            ]
+          ]
+        ],
+        [
+          "StateRef",
+          ":value",
+          "state",
+          ":setter",
+          "setter"
+        ]
+      ]
+    ],
+    "doc": "",
+    "examples": [],
+    "ffi": null,
+    "ffi_edn": null,
+    "id": "reacher.core/use-atom",
+    "js_ffi": null,
+    "schema": [
+      "{}",
+      [
+        ":kind",
+        ":fn"
+      ],
+      [
+        ":return",
+        "'reacher.core/StateRef"
+      ],
+      [
+        ":args",
+        [
+          "[]",
+          "'Dynamic"
+        ]
+      ],
+      [
+        ":features",
+        [
+          "#{}",
+          ":js-ffi"
+        ]
+      ]
+    ],
+    "tags": [],
+    "tests": []
+  },
+  {
+    "code": [
+      "defn",
+      "use-dispatch",
+      [],
+      [
+        "let",
+        [
+          [
+            "value",
+            [
+              "React/useContext",
+              "context-of-dispatch"
+            ]
+          ]
+        ],
+        [
+          "if",
+          [
+            "fn?",
+            "value"
+          ],
+          "value",
+          [
+            "raise",
+            "|React dispatch context expects a function"
+          ]
+        ]
+      ]
+    ],
+    "doc": "",
+    "examples": [],
+    "ffi": null,
+    "ffi_edn": null,
+    "id": "reacher.core/use-dispatch",
+    "js_ffi": null,
+    "schema": [
+      "{}",
+      [
+        ":kind",
+        ":fn"
+      ],
+      [
+        ":return",
+        "'Fn"
+      ],
+      [
+        ":args",
+        [
+          "[]"
+        ]
+      ],
+      [
+        ":features",
+        [
+          "#{}",
+          ":js-ffi"
+        ]
+      ]
+    ],
+    "tags": [],
+    "tests": []
+  },
+  {
+    "code": [
+      "defn",
+      "use-effect!",
+      [
+        "params",
+        "f"
+      ],
+      [
+        "React/useEffect",
+        "f",
+        [
+          "to-js-data",
+          "params"
+        ]
+      ],
+      "&unit"
+    ],
+    "doc": "",
+    "examples": [],
+    "ffi": null,
+    "ffi_edn": null,
+    "id": "reacher.core/use-effect!",
+    "js_ffi": null,
+    "schema": [
+      "{}",
+      [
+        ":kind",
+        ":fn"
+      ],
+      [
+        ":return",
+        "'Unit"
+      ],
+      [
+        ":args",
+        [
+          "[]",
+          [
+            "::",
+            "'List",
+            "'Dynamic"
+          ],
+          [
+            "::",
+            "'Fn",
+            [
+              "{}",
+              [
+                ":return",
+                "'Unit"
+              ],
+              [
+                ":args",
+                [
+                  "[]"
+                ]
+              ]
+            ]
+          ]
+        ]
+      ],
+      [
+        ":features",
+        [
+          "#{}",
+          ":js-ffi"
+        ]
+      ]
+    ],
+    "tags": [],
+    "tests": []
+  },
+  {
+    "code": [
+      "defn",
+      "wrap-comp",
+      [
+        "f",
+        "props",
+        "&",
+        "children"
+      ],
+      [
+        "js-ffi.contract/expect-object",
+        "|React.wrap-comp",
+        [
+          "React/createElement",
+          "f",
+          "props",
+          "&",
+          "children"
+        ]
+      ]
+    ],
+    "doc": "",
+    "examples": [],
+    "ffi": null,
+    "ffi_edn": null,
+    "id": "reacher.core/wrap-comp",
+    "js_ffi": null,
+    "schema": [
+      "{}",
+      [
+        ":kind",
+        ":fn"
+      ],
+      [
+        ":rest",
+        "'Dynamic"
+      ],
+      [
+        ":return",
+        "'JsObject"
+      ],
+      [
+        ":args",
+        [
+          "[]",
+          "'Dynamic",
+          "'Dynamic"
+        ]
+      ],
+      [
+        ":features",
+        [
+          "#{}",
+          ":js-ffi"
+        ]
+      ]
+    ],
+    "tags": [],
+    "tests": []
+  },
+  {
+    "code": [
+      "defn",
+      "read-input-value",
+      [
+        "event"
+      ],
+      [
+        "let",
+        [
+          [
+            "target",
+            [
+              "contract/expect-object",
+              "|event.target",
+              [
+                "contract/object-field",
+                "|event",
+                "event",
+                "|target"
+              ]
+            ]
+          ]
+        ],
+        [
+          "contract/expect-string",
+          "|event.target.value",
+          [
+            "contract/object-field",
+            "|event.target",
+            "target",
+            "|value"
+          ]
+        ]
+      ]
+    ],
+    "doc": "",
+    "examples": [],
+    "ffi": null,
+    "ffi_edn": null,
+    "id": "reacher.ffi/read-input-value",
+    "js_ffi": null,
+    "schema": [
+      "{}",
+      [
+        ":kind",
+        ":fn"
+      ],
+      [
+        ":return",
+        "'String"
+      ],
+      [
+        ":args",
+        [
+          "[]",
+          "'Dynamic"
+        ]
+      ],
+      [
+        ":features",
+        [
+          "#{}",
+          ":js-ffi"
+        ]
+      ]
+    ],
+    "tags": [],
+    "tests": []
+  },
+  {
+    "code": [
+      "defn",
+      "read-store-prop",
+      [
+        "props"
+      ],
+      [
+        "let",
+        [
+          [
+            "value",
+            [
+              "contract/object-field",
+              "|component.props",
+              "props",
+              "|store"
+            ]
+          ]
+        ],
+        [
+          "if",
+          [
+            "struct?",
+            "value"
+          ],
+          [
+            "struct-match",
+            "value",
+            [
+              "reacher.app.schema/Store",
+              "store",
+              "store"
+            ],
+            [
+              "_",
+              "_",
+              [
+                "raise",
+                "|JS_FFI_contract_violation:_component.props.store_expected_Store"
+              ]
+            ]
+          ],
+          [
+            "raise",
+            "|JS_FFI_contract_violation:_component.props.store_expected_Store"
+          ]
+        ]
+      ]
+    ],
+    "doc": "",
+    "examples": [],
+    "ffi": null,
+    "ffi_edn": null,
+    "id": "reacher.ffi/read-store-prop",
+    "js_ffi": null,
+    "schema": [
+      "{}",
+      [
+        ":kind",
+        ":fn"
+      ],
+      [
+        ":return",
+        "'reacher.app.schema/Store"
+      ],
+      [
+        ":args",
+        [
+          "[]",
+          [
+            "::",
+            "'JsNullish",
+            "'JsObject"
+          ]
+        ]
+      ],
+      [
+        ":features",
+        [
+          "#{}",
+          ":js-ffi"
+        ]
+      ]
+    ],
+    "tags": [],
+    "tests": [
+      {
+        "code": [
+          "calcit.test/is-throws",
+          [
+            "read-store-prop",
+            [
+              "js-object",
+              [
+                ":store",
+                [
+                  "reacher.app.schema/Task",
+                  ":id",
+                  "|t",
+                  ":time",
+                  "0",
+                  ":done?",
+                  "false",
+                  ":text",
+                  "|x"
+                ]
+              ]
+            ]
+          ]
+        ],
+        "name": "reject-task-as-store",
+        "tags": []
+      }
+    ]
+  },
+  {
+    "code": [
+      "defn",
+      "read-task-prop",
+      [
+        "props"
+      ],
+      [
+        "let",
+        [
+          [
+            "value",
+            [
+              "contract/object-field",
+              "|component.props",
+              "props",
+              "|task"
+            ]
+          ]
+        ],
+        [
+          "if",
+          [
+            "struct?",
+            "value"
+          ],
+          [
+            "struct-match",
+            "value",
+            [
+              "reacher.app.schema/Task",
+              "task",
+              "task"
+            ],
+            [
+              "_",
+              "_",
+              [
+                "raise",
+                "|JS_FFI_contract_violation:_component.props.task_expected_Task"
+              ]
+            ]
+          ],
+          [
+            "raise",
+            "|JS_FFI_contract_violation:_component.props.task_expected_Task"
+          ]
+        ]
+      ]
+    ],
+    "doc": "",
+    "examples": [],
+    "ffi": null,
+    "ffi_edn": null,
+    "id": "reacher.ffi/read-task-prop",
+    "js_ffi": null,
+    "schema": [
+      "{}",
+      [
+        ":kind",
+        ":fn"
+      ],
+      [
+        ":return",
+        "'reacher.app.schema/Task"
+      ],
+      [
+        ":args",
+        [
+          "[]",
+          [
+            "::",
+            "'JsNullish",
+            "'JsObject"
+          ]
+        ]
+      ],
+      [
+        ":features",
+        [
+          "#{}",
+          ":js-ffi"
+        ]
+      ]
+    ],
+    "tags": [],
+    "tests": [
+      {
+        "code": [
+          "calcit.test/is-throws",
+          [
+            "read-task-prop",
+            [
+              "js-object",
+              [
+                ":task",
+                [
+                  "reacher.app.schema/Store",
+                  ":tasks",
+                  [
+                    "[]"
+                  ]
+                ]
+              ]
+            ]
+          ]
+        ],
+        "name": "reject-store-as-task",
+        "tags": []
+      }
+    ]
+  },
+  {
+    "code": [
+      "deftrait",
+      "RegexHost",
+      [
+        ".test",
+        [
+          "::",
+          "'Fn",
+          [
+            "{}",
+            [
+              ":args",
+              [
+                "[]",
+                "'reacher.util.str/RegexHost",
+                "'String"
+              ]
+            ],
+            [
+              ":return",
+              "'Bool"
+            ]
+          ]
+        ]
+      ]
+    ],
+    "doc": "",
+    "examples": [],
+    "ffi": {
+      ":backend": {
+        "__edn_tag": "js"
+      },
+      ":kind": {
+        "__edn_tag": "external-object"
+      },
+      ":names": {
+        ":test": "test"
+      },
+      ":target": {
+        "__edn_tag": "browser"
+      }
+    },
+    "ffi_edn": "{} (:backend :js) (:kind :external-object) (:target :browser)\n  :names $ {} $ :test |test",
+    "id": "reacher.util.str/RegexHost",
+    "js_ffi": null,
+    "schema": "'Trait",
+    "tags": [],
+    "tests": []
+  },
+  {
+    "code": [
+      "defn",
+      "create-regex-host",
+      [
+        "pattern",
+        "flags"
+      ],
+      [
+        "js-cast",
+        [
+          "new",
+          "js/RegExp",
+          "pattern",
+          "flags"
+        ],
+        "'reacher.util.str/RegexHost"
+      ]
+    ],
+    "doc": "",
+    "examples": [],
+    "ffi": null,
+    "ffi_edn": null,
+    "id": "reacher.util.str/create-regex-host",
+    "js_ffi": null,
+    "schema": [
+      "{}",
+      [
+        ":kind",
+        ":fn"
+      ],
+      [
+        ":return",
+        "'reacher.util.str/RegexHost"
+      ],
+      [
+        ":args",
+        [
+          "[]",
+          "'String",
+          "'String"
+        ]
+      ],
+      [
+        ":features",
+        [
+          "#{}",
+          ":js-ffi"
+        ]
+      ]
+    ],
+    "tags": [],
+    "tests": []
+  },
+  {
+    "code": [
+      "defn",
+      "dashed->camel",
+      [
+        "x"
+      ],
+      [
+        "contract/expect-string",
+        "|String.replace",
+        [
+          ".!replace",
+          "x",
+          "dashed-letter-pattern",
+          [
+            "fn",
+            [
+              "cc",
+              "pos",
+              "prop"
+            ],
+            [
+              ".!toUpperCase",
+              [
+                "contract/expect-string",
+                "|dashed-letter",
+                [
+                  "aget",
+                  "cc",
+                  "1"
+                ]
+              ]
+            ]
+          ]
+        ]
+      ]
+    ],
+    "doc": "",
+    "examples": [],
+    "ffi": null,
+    "ffi_edn": null,
+    "id": "reacher.util.str/dashed->camel",
+    "js_ffi": null,
+    "schema": [
+      "{}",
+      [
+        ":kind",
+        ":fn"
+      ],
+      [
+        ":return",
+        "'String"
+      ],
+      [
+        ":args",
+        [
+          "[]",
+          "'String"
+        ]
+      ],
+      [
+        ":features",
+        [
+          "#{}",
+          ":js-ffi"
+        ]
+      ]
+    ],
+    "tags": [],
+    "tests": []
+  },
+  {
+    "code": [
+      "def",
+      "dashed-letter-pattern",
+      [
+        "create-regex-host",
+        "|-[a-z]",
+        "|g"
+      ]
+    ],
+    "doc": "",
+    "examples": [],
+    "ffi": null,
+    "ffi_edn": null,
+    "id": "reacher.util.str/dashed-letter-pattern",
+    "js_ffi": null,
+    "schema": "'reacher.util.str/RegexHost",
+    "tags": [],
+    "tests": []
+  },
+  {
+    "code": [
+      "defn",
+      "escape-html",
+      [
+        "text"
+      ],
+      [
+        "let",
+        [
+          [
+            "a",
+            [
+              "contract/expect-string",
+              "|escape.quote",
+              [
+                ".!replace",
+                "text",
+                "|\"",
+                "|&quot;"
+              ]
+            ]
+          ],
+          [
+            "b",
+            [
+              "contract/expect-string",
+              "|escape.lt",
+              [
+                ".!replace",
+                "a",
+                "|<",
+                "|&lt;"
+              ]
+            ]
+          ],
+          [
+            "c",
+            [
+              "contract/expect-string",
+              "|escape.gt",
+              [
+                ".!replace",
+                "b",
+                "|>",
+                "|&gt;"
+              ]
+            ]
+          ]
+        ],
+        [
+          "contract/expect-string",
+          "|escape.newline",
+          [
+            ".!replace",
+            "c",
+            "&newline",
+            "|&#13;&#10;"
+          ]
+        ]
+      ]
+    ],
+    "doc": "",
+    "examples": [],
+    "ffi": null,
+    "ffi_edn": null,
+    "id": "reacher.util.str/escape-html",
+    "js_ffi": null,
+    "schema": [
+      "{}",
+      [
+        ":kind",
+        ":fn"
+      ],
+      [
+        ":return",
+        "'String"
+      ],
+      [
+        ":args",
+        [
+          "[]",
+          "'String"
+        ]
+      ],
+      [
+        ":features",
+        [
+          "#{}",
+          ":js-ffi"
+        ]
+      ]
+    ],
+    "tags": [],
+    "tests": []
+  },
+  {
+    "code": [
+      "defn",
+      "get-style-value",
+      [
+        "x",
+        "prop"
+      ],
+      [
+        "cond",
+        [
+          [
+            "string?",
+            "x"
+          ],
+          "x"
+        ],
+        [
+          [
+            "tag?",
+            "x"
+          ],
+          [
+            "reacher.util.str/scalar-string",
+            "x"
+          ]
+        ],
+        [
+          [
+            "number?",
+            "x"
+          ],
+          [
+            "if",
+            [
+              "pattern-non-dimension-props",
+              ".test",
+              "prop"
+            ],
+            [
+              "str",
+              "x"
+            ],
+            [
+              "str",
+              "x",
+              "|px"
+            ]
+          ]
+        ],
+        [
+          "true",
+          [
+            "str",
+            "x"
+          ]
+        ]
+      ]
+    ],
+    "doc": "",
+    "examples": [],
+    "ffi": null,
+    "ffi_edn": null,
+    "id": "reacher.util.str/get-style-value",
+    "js_ffi": null,
+    "schema": [
+      "{}",
+      [
+        ":kind",
+        ":fn"
+      ],
+      [
+        ":return",
+        "'String"
+      ],
+      [
+        ":args",
+        [
+          "[]",
+          "'Dynamic",
+          "'String"
+        ]
+      ],
+      [
+        ":features",
+        [
+          "#{}",
+          ":js-ffi"
+        ]
+      ]
+    ],
+    "tags": [],
+    "tests": []
+  },
+  {
+    "code": [
+      "def",
+      "pattern-non-dimension-props",
+      [
+        "create-regex-host",
+        "|acit|ex(?:s|g|n|p|$)|rph|grid|ows|mnc|ntw|ine[ch]|zoo|^ord|itera",
+        "|i"
+      ]
+    ],
+    "doc": "",
+    "examples": [],
+    "ffi": null,
+    "ffi_edn": null,
+    "id": "reacher.util.str/pattern-non-dimension-props",
+    "js_ffi": null,
+    "schema": "'reacher.util.str/RegexHost",
+    "tags": [],
+    "tests": []
+  },
+  {
+    "code": [
+      "defn",
+      "scalar-string",
+      [
+        "value"
+      ],
+      [
+        "match",
+        [
+          "data-view",
+          "value"
+        ],
+        [
+          [
+            ":nil"
+          ],
+          "|"
+        ],
+        [
+          [
+            ":string",
+            "text"
+          ],
+          "text"
+        ],
+        [
+          [
+            ":tag",
+            "tag"
+          ],
+          [
+            "to-string",
+            "tag"
+          ]
+        ],
+        [
+          [
+            ":number",
+            "n"
+          ],
+          [
+            "to-string",
+            "n"
+          ]
+        ],
+        [
+          [
+            ":bool",
+            "b"
+          ],
+          [
+            "to-string",
+            "b"
+          ]
+        ],
+        [
+          [
+            ":symbol",
+            "sym"
+          ],
+          [
+            "to-string",
+            "sym"
+          ]
+        ],
+        [
+          "_",
+          [
+            "raise",
+            "|expected scalar text"
+          ]
+        ]
+      ]
+    ],
+    "doc": "",
+    "examples": [],
+    "ffi": null,
+    "ffi_edn": null,
+    "id": "reacher.util.str/scalar-string",
+    "js_ffi": null,
+    "schema": [
+      "{}",
+      [
+        ":kind",
+        ":fn"
+      ],
+      [
+        ":return",
+        "'String"
+      ],
+      [
+        ":args",
+        [
+          "[]",
+          "'Dynamic"
+        ]
+      ]
+    ],
+    "tags": [],
+    "tests": []
+  },
+  {
+    "code": [
+      "defn",
+      "style->string",
+      [
+        "styles"
+      ],
+      [
+        "->",
+        [
+          "&map:to-list",
+          "styles"
+        ],
+        [
+          "map",
+          [
+            "fn",
+            [
+              "entry"
+            ],
+            [
+              "let",
+              [
+                [
+                  "k",
+                  [
+                    "option:unwrap",
+                    [
+                      "first",
+                      "entry"
+                    ]
+                  ]
+                ],
+                [
+                  "style-name",
+                  [
+                    "reacher.util.str/scalar-string",
+                    [
+                      "decode-map-as",
+                      "k",
+                      "'Tag"
+                    ]
+                  ]
+                ],
+                [
+                  "v",
+                  [
+                    "dbg",
+                    [
+                      "get-style-value",
+                      [
+                        "option:unwrap",
+                        [
+                          "last",
+                          "entry"
+                        ]
+                      ],
+                      [
+                        "dashed->camel",
+                        "style-name"
+                      ]
+                    ]
+                  ]
+                ]
+              ],
+              [
+                "str",
+                "style-name",
+                "|:",
+                [
+                  "escape-html",
+                  "v"
+                ],
+                "|;"
+              ]
+            ]
+          ]
+        ],
+        [
+          "join-string",
+          "|"
+        ]
+      ]
+    ],
+    "doc": "",
+    "examples": [],
+    "ffi": null,
+    "ffi_edn": null,
+    "id": "reacher.util.str/style->string",
+    "js_ffi": null,
+    "schema": [
+      "{}",
+      [
+        ":kind",
+        ":fn"
+      ],
+      [
+        ":return",
+        "'String"
+      ],
+      [
+        ":args",
+        [
+          "[]",
+          [
+            "::",
+            "'Map",
+            "'Tag",
+            "'V"
+          ]
+        ]
+      ],
+      [
+        ":generics",
+        [
+          "[]",
+          "'V"
+        ]
+      ]
+    ],
+    "tags": [],
+    "tests": []
+  }
+]
