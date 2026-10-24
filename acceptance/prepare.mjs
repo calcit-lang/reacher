@@ -38,7 +38,7 @@ assert.deepEqual(counts,{option:7,map:6,merge:3,conj:1,filter:1});
 const get=id=>expected.find(d=>d.id===id);
 const strip=get('reacher.core/map-strip-keyword');
 assert.deepEqual(strip.code[3],['.map','xs',['fn',['x'],['if',['tag?','x'],['to-string','x'],'x']]]);
-strip.code[3][2]='to-string';
+strip.code[3][2].splice(2,0,hint(["'Tag"],"'String"));
 function addMapHint(d,predicate,args,returns){
   const matches=[];
   function walk(n){if(!Array.isArray(n))return;if(n[0]==='.map'&&predicate(n))matches.push(n);n.forEach(walk);}
@@ -62,7 +62,7 @@ const args=['edit','transaction','--file','acceptance/operations.json','--format
 const preview=JSON.parse(run(...args,'--dry-run'));assert.ok(preview.scoped_revision);
 writeFileSync('acceptance/preview.json',JSON.stringify(preview,null,2));
 writeFileSync('acceptance/applied.json',run(...args,'--expect-revision',preview.scoped_revision));
-assert.deepEqual(inventory(),expected,'All62views:reviewed18sites/5callbackcontracts/Tagstringmapper;publicschema/FFI/2tests/HUD/Reactsetteridentity/restore-before-watch/protocol unchanged');
+assert.deepEqual(inventory(),expected,'All62views:reviewed18sites/6callbackcontracts;publicschema/FFI/2tests/HUD/Reactsetteridentity/restore-before-watch/protocol/nontagfallback unchanged');
 assert.deepEqual(q('config'),config);
 writeFileSync('acceptance/after.json',JSON.stringify(expected,null,2));
 writeFileSync('acceptance/snapshot-blob.txt',execFileSync('git',['hash-object','calcit.cirru'],{encoding:'utf8'}));
