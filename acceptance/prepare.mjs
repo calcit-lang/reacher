@@ -42,7 +42,7 @@ strip.code[3][2]='to-string';
 function addMapHint(d,predicate,args,returns){
   const matches=[];
   function walk(n){if(!Array.isArray(n))return;if(n[0]==='.map'&&predicate(n))matches.push(n);n.forEach(walk);}
-  walk(d.code);assert.equal(matches.length,1,d.id);const f=matches[0][2];assert.equal(f[0],'fn');assert.ok(f[2][0]!=='hint-fn');f.splice(2,0,hint(args,returns));
+  walk(d.code);assert.equal(matches.length,1,d.id);const f=matches[0].at(-1);assert.equal(f[0],'fn');assert.ok(f[2][0]!=='hint-fn');f.splice(2,0,hint(args,returns));
 }
 addMapHint(get('reacher.app.schema/decode-store'),n=>n[1]==='tasks',["'Dynamic"],optionTask);
 addMapHint(get('reacher.app.comp.container/comp-container'),n=>n[1]==='tasks',[task],"'JsObject");
