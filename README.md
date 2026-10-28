@@ -4,8 +4,12 @@ Reacher: React.js in calcit-js
 
 Demo https://repo.calcit-lang.org/reacher/ .
 
-使用者注意：本轮保持正式 Calcit CLI / `@calcit/procs` **0.30.1**，
-配对 UI **0.8.1** / JS-FFI **0.2.6**；请同步完整依赖图、重新生成 JS 并完整刷新页面，不混装旧 alpha。
+使用者注意：本轮保持正式 Calcit CLI / `@calcit/procs` **0.31.0**，
+配对 UI **0.9.0-alpha.4** / JS-FFI **0.2.7**；请同步完整依赖图、重新生成 JS 并完整刷新页面，不混装旧 alpha。
+这次修复升级后“新建任务刷新即被拒绝”的存档恢复问题：序列化 Struct 不保留本地名义来源，
+恢复入口将 Struct 作为 wire 数据转为 Map，检查 id/time/done?/text 全部字段，随后构造本地 Task/Store。
+名称不是身份或授权；组件 props 的名义类型检查保持不变，不接受错误类型冒充 Task/Store。
+原 FFI 测试补充真实序列化往返及非法字段拒绝，浏览器已验证任务和完成状态刷新恢复。
 React 18、公开组件 API、状态/存储格式及 setter 身份不变；UI 基础样式可能变化。
 Demo 先读取/恢复存档，再首次渲染和注册 watch/离页保存：解析抛错时不再留下
 会覆盖原存档的保存回调。合法 EDN 但不符合 Store 的值仍按原逻辑显示 HUD，
@@ -71,9 +75,9 @@ https://github.com/calcit-lang/respo-calcit-workflow
 
 ### Calcit 与 COS/CDN
 
-本轮保持正式 Calcit / `@calcit/procs` `0.30.1`；
-模块依赖为已发布的 Respo UI `0.8.1`、JS-FFI `0.2.6`，不新增 alpha
-或 Git hash 模块依赖。传递依赖统一到 Respo `0.16.126`、Router `0.8.38`；
+本轮保持正式 Calcit / `@calcit/procs` `0.31.0`；
+模块依赖为已发布的 Respo UI `0.9.0-alpha.4`、JS-FFI `0.2.7`。UI 对应 0.31.0 的已发布 tag 仍为 alpha，
+传递依赖为 Respo `0.17.0-alpha.4`、Router `0.9.0-alpha.3`；没有引入 Git hash。
 CI 使用 `caps --strict --ci` 验证，不再允许版本选择警告。
 CI 检查规范快照、全部定义和现有 FFI 测试，完整 strict 要求 passed 且 diagnostics 为空；
 不再调用硬编码 fix preset 或重复输出类型统计。

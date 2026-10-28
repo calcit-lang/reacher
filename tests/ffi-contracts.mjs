@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 
 import * as calcit from "../js-out/calcit.core.mjs";
-import { Store, Task } from "../js-out/reacher.app.schema.mjs";
+import { Store, Task, decode_store } from "../js-out/reacher.app.schema.mjs";
 import {
   read_input_value,
   read_store_prop,
@@ -48,3 +48,12 @@ assert.throws(
   () => read_task_prop({ task: store }),
   /component\.props\.task_expected_Task/,
 );
+
+// Persisted Struct values have no local nominal origin. Decode fields before restoring it.
+const wire = calcit.parse_cirru_edn(calcit.format_cirru_edn(store));
+const restored = calcit.option_$o_unwrap(decode_store(wire));
+assert.equal(read_store_prop({ store: restored }), restored);
+assert.equal(calcit.format_cirru_edn(restored), calcit.format_cirru_edn(store));
+assert.equal(calcit.option_$o_none_$q_(decode_store(
+  calcit.parse_cirru_edn('{} $ :tasks $ [] $ {} (:id |bad) (:time 0) (:done? false) (:text 42)')
+)), true);
