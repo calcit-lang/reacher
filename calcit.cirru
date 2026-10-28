@@ -234,7 +234,8 @@
           :code $ quote $ defstruct Task (:id 'String) (:time 'Number) (:done? 'Bool) (:text 'String)
           :examples $ []
           :schema $ :: 'StructDef
-        'decode-store $ %{} 'CodeEntry (:doc |)
+        'decode-store $ %{} 'CodeEntry
+          :doc "|Decode persisted wire data by checking every task field and reconstructing local Task/Store values. Serialized Struct origin is not preserved; Struct names are not identity or authorization at this boundary. Component props still require local nominal values."
           :code $ quote $ defn decode-store (data)
             if
               or (map? data) (struct? data)
@@ -249,9 +250,7 @@
                           assert-type
                             let
                                 candidate $ if (struct? data)
-                                  struct-match data
-                                    Task task $ Option :some task
-                                    _ _ $ Option :none
+                                  Option :some $ .to-map data
                                   if (map? data) (Option :some data) (Option :none)
                               match candidate
                                 (:some value)
