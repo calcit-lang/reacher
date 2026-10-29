@@ -41,13 +41,10 @@
                     , |Run
                 =< 8 0
                 div ({}) & $ .map tasks $ fn (task)
-                  hint-fn $ {} (:return 'JsObject)
-                    :args $ [] 'reacher.app.schema/Task
+                  hint-fn $ Fn reacher.app.schema/Task $ -> JsObject
                   wrap-comp memod-comp-task $ &js-object :task task :id $ :id task
           :examples $ []
-          :schema $ :: 'Fn $ {} (:rest 'Dynamic) (:return 'JsObject)
-            :args $ [] $ :: 'JsNullish 'JsObject
-            :features $ #{} :js-ffi
+          :schema $ quote $ Fn (JsNullish JsObject) & Dynamic (-> JsObject) (:features :js-ffi)
         'comp-task $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn comp-task (props & host-args)
             use-effect!
@@ -77,13 +74,11 @@
                     d! $ schema/Op :rm-task $ :id task
                   , |rm
           :examples $ []
-          :schema $ :: 'Fn $ {} (:rest 'Dynamic) (:return 'JsObject)
-            :args $ [] $ :: 'JsNullish 'JsObject
-            :features $ #{} :js-ffi
+          :schema $ quote $ Fn (JsNullish JsObject) & Dynamic (-> JsObject) (:features :js-ffi)
         'memod-comp-task $ %{} 'CodeEntry (:doc |)
           :code $ quote $ def memod-comp-task (re-memo comp-task)
           :examples $ []
-          :schema $ :: 'JsObject
+          :schema $ quote JsObject
       :ns $ %{} 'NsEntry (:doc |)
         :code $ quote $ ns reacher.app.comp.container
           :require (respo-ui.core :as ui)
@@ -99,16 +94,16 @@
         'Site $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstruct Site (:storage-key 'String)
           :examples $ []
-          :schema $ :: 'StructDef
+          :schema $ quote StructDef
         'dev? $ %{} 'CodeEntry (:doc |)
           :code $ quote $ def dev?
             = |dev $ .unwrap-or (get-env |mode) |release
           :examples $ []
-          :schema $ :: 'Bool
+          :schema $ quote Bool
         'site $ %{} 'CodeEntry (:doc |)
           :code $ quote $ def site (Site :storage-key |workflow)
           :examples $ []
-          :schema $ :: 'reacher.app.config/Site
+          :schema $ quote reacher.app.config/Site
       :ns $ %{} 'NsEntry (:doc |)
         :code $ quote $ ns reacher.app.config
     'reacher.app.main $ %{} 'FileEntry
@@ -117,14 +112,12 @@
           :code $ quote $ defref *store
             schema/Store :tasks $ []
           :examples $ []
-          :schema $ :: 'Ref 'reacher.app.schema/Store
+          :schema $ quote $ Ref reacher.app.schema/Store
         'create-root-host $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn create-root-host (target)
             js-cast (createRoot target) 'reacher.core/ReactRootHost
           :examples $ []
-          :schema $ :: 'Fn $ {} (:return 'reacher.core/ReactRootHost)
-            :args $ [] 'js-ffi.browser/DomElementHost
-            :features $ #{} :js-ffi
+          :schema $ quote $ Fn js-ffi.browser/DomElementHost (-> reacher.core/ReactRootHost) (:features :js-ffi)
         'dispatch! $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn dispatch! (op)
             when config/dev? $ println |Dispatch: op
@@ -133,9 +126,7 @@
               reset! *store $ updater @*store op (generate-id!) (:timestamp now)
               , &unit
           :examples $ []
-          :schema $ :: 'Fn $ {} (:return 'Unit)
-            :args $ [] 'reacher.app.schema/Op
-            :features $ #{} :js-ffi
+          :schema $ quote $ Fn reacher.app.schema/Op (-> Unit) (:features :js-ffi)
         'main! $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn main! ()
             println |Running_mode: $ if config/dev? |dev |release
@@ -155,21 +146,17 @@
             println |App_started.
             , &unit
           :examples $ []
-          :schema $ :: 'Fn $ {} (:return 'Unit)
-            :args $ []
-            :features $ #{} :js-ffi
+          :schema $ quote $ Fn (-> Unit) (:features :js-ffi)
         'mount-target $ %{} 'CodeEntry (:doc |)
           :code $ quote $ def mount-target
             create-root-host $ .unwrap $ browser/query-selector |.app
           :examples $ []
-          :schema $ :: 'reacher.core/ReactRootHost
+          :schema $ quote reacher.core/ReactRootHost
         'persist-storage! $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn persist-storage! ()
             browser/storage-set! (:storage-key config/site) (format-cirru-edn @*store)
           :examples $ []
-          :schema $ :: 'Fn $ {} (:return 'Unit)
-            :args $ []
-            :features $ #{} :js-ffi
+          :schema $ quote $ Fn (-> Unit) (:features :js-ffi)
         'reload! $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn reload! ()
             if (nil? build-errors)
@@ -180,9 +167,7 @@
               hud! |error build-errors
             , &unit
           :examples $ []
-          :schema $ :: 'Fn $ {} (:return 'Unit)
-            :args $ []
-            :features $ #{} :js-ffi
+          :schema $ quote $ Fn (-> Unit) (:features :js-ffi)
         'render-app! $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn render-app! ()
             mount-target .render! $ wrap-comp dispatch-provider
@@ -190,9 +175,7 @@
               wrap-comp comp-container $ js-object $ :store @*store
             , &unit
           :examples $ []
-          :schema $ :: 'Fn $ {} (:return 'Unit)
-            :args $ []
-            :features $ #{} :js-ffi
+          :schema $ quote $ Fn (-> Unit) (:features :js-ffi)
         'repeat! $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn repeat! (duration cb)
             js/setTimeout
@@ -201,11 +184,10 @@
               * 1000 duration
             , &unit
           :examples $ []
-          :schema $ :: 'Fn $ {} (:return 'Unit)
-            :args $ [] 'Number $ :: 'Fn
-              {} (:return 'Unit)
-                :args $ []
-            :features $ #{} :js-ffi
+          :schema $ quote $ Fn Number
+            Fn $ -> Unit
+            -> Unit
+            :features :js-ffi
       :ns $ %{} 'NsEntry (:doc |)
         :code $ quote $ ns reacher.app.main
           :require
@@ -224,16 +206,16 @@
         'Op $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defenum Op (:add-task 'String) (:rm-task 'String) (:toggle-task 'String) (:hydrate-storage 'reacher.app.schema/Store)
           :examples $ []
-          :schema $ :: 'EnumDef
+          :schema $ quote EnumDef
         'Store $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstruct Store
-            :tasks $ :: 'List 'reacher.app.schema/Task
+            :tasks $ quote $ List reacher.app.schema/Task
           :examples $ []
-          :schema $ :: 'StructDef
+          :schema $ quote StructDef
         'Task $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstruct Task (:id 'String) (:time 'Number) (:done? 'Bool) (:text 'String)
           :examples $ []
-          :schema $ :: 'StructDef
+          :schema $ quote StructDef
         'decode-store $ %{} 'CodeEntry
           :doc "|Decode persisted wire data by checking every task field and reconstructing local Task/Store values. Serialized Struct origin is not preserved; Struct names are not identity or authorization at this boundary. Component props still require local nominal values."
           :code $ quote $ defn decode-store (data)
@@ -244,9 +226,7 @@
                   if (list? tasks)
                     let
                         decoded-tasks $ .map tasks $ fn (data)
-                          hint-fn $ {}
-                            :return $ :: 'Option 'reacher.app.schema/Task
-                            :args $ [] 'Dynamic
+                          hint-fn $ Fn Dynamic $ -> (Option reacher.app.schema/Task)
                           assert-type
                             let
                                 candidate $ if (struct? data)
@@ -267,27 +247,24 @@
                                                     Option :some $ Task :id id :time time :done? done? :text text
                                                     Option :none
                                 (:none) (Option :none)
-                            :: 'Option 'reacher.app.schema/Task
+                            quote $ Option reacher.app.schema/Task
                       if
                         every? decoded-tasks $ fn (task)
-                          hint-fn $ {} (:return 'Bool)
-                            :args $ [] $ :: 'Option 'reacher.app.schema/Task
+                          hint-fn $ Fn (Option reacher.app.schema/Task) (-> Bool)
                           .some? task
                         Option :some $ Store :tasks $ assert-type
                           .map decoded-tasks $ fn (task)
-                            hint-fn $ {} (:return 'reacher.app.schema/Task)
-                              :args $ [] $ :: 'Option 'reacher.app.schema/Task
+                            hint-fn $ Fn (Option reacher.app.schema/Task) (-> reacher.app.schema/Task)
                             .unwrap task
-                          :: 'List 'reacher.app.schema/Task
+                          quote $ List reacher.app.schema/Task
                         Option :none
                     Option :none
                 (:none) (Option :none)
               Option :none
           :examples $ []
-          :schema $ :: 'Fn $ {}
-            :args $ [] 'Dynamic
-            :features $ #{} :js-ffi
-            :return $ :: 'Option 'reacher.app.schema/Store
+          :schema $ quote $ Fn Dynamic
+            -> $ Option reacher.app.schema/Store
+            :features :js-ffi
       :ns $ %{} 'NsEntry (:doc |)
         :code $ quote $ ns reacher.app.schema
     'reacher.app.updater $ %{} 'FileEntry
@@ -301,24 +278,19 @@
               (:rm-task task-id)
                 reacher.app.schema/Store :tasks $ .filter (:tasks store)
                   fn (task)
-                    hint-fn $ {}
-                      :args $ [] 'reacher.app.schema/Task
-                      :return 'Bool
+                    hint-fn $ Fn reacher.app.schema/Task $ -> Bool
                     not= task-id $ :id task
               (:toggle-task task-id)
                 reacher.app.schema/Store :tasks $ .map (:tasks store)
                   fn (task)
-                    hint-fn $ {}
-                      :args $ [] 'reacher.app.schema/Task
-                      :return 'reacher.app.schema/Task
+                    hint-fn $ Fn reacher.app.schema/Task $ -> reacher.app.schema/Task
                     if
                       = task-id $ :id task
                       update task :done? not
                       , task
               (:hydrate-storage data) data
           :examples $ []
-          :schema $ :: 'Fn $ {} (:return 'reacher.app.schema/Store)
-            :args $ [] 'reacher.app.schema/Store 'reacher.app.schema/Op 'String 'Number
+          :schema $ quote $ Fn reacher.app.schema/Store reacher.app.schema/Op String Number (-> reacher.app.schema/Store)
       :ns $ %{} 'NsEntry (:doc |)
         :code $ quote $ ns reacher.app.updater (:require)
     'reacher.core $ %{} 'FileEntry
@@ -331,122 +303,89 @@
               React/createElement |div $ js-object $ |style
                 js-object $ |height h
           :examples $ []
-          :schema $ :: 'Fn $ {} (:return 'JsObject)
-            :args $ [] 'Dynamic 'Dynamic
-            :features $ #{} :js-ffi
+          :schema $ quote $ Fn Dynamic Dynamic (-> JsObject) (:features :js-ffi)
         'JsKeyArrayHost $ %{} 'CodeEntry (:doc |)
           :code $ quote $ deftrait JsKeyArrayHost (:length 'Number)
-            .includes $ :: 'Fn $ {}
-              :args $ [] 'reacher.core/JsKeyArrayHost 'String
-              :return 'Bool
-            .every $ :: 'Fn $ {}
-              :args $ [] 'reacher.core/JsKeyArrayHost $ :: 'Fn
-                {}
-                  :args $ [] 'String 'Number 'reacher.core/JsKeyArrayHost
-                  :return 'Bool
-              :return 'Bool
+            .includes $ quote $ Fn reacher.core/JsKeyArrayHost String (-> Bool)
+            .every $ quote $ Fn reacher.core/JsKeyArrayHost
+              Fn String Number reacher.core/JsKeyArrayHost $ -> Bool
+              -> Bool
           :examples $ []
           :ffi $ {} (:backend :js) (:kind :external-object) (:target :browser)
             :names $ {} (:every |every) (:includes |includes)
-          :schema $ :: 'Trait
+          :schema $ quote Trait
         'ReactRootHost $ %{} 'CodeEntry (:doc |)
           :code $ quote $ deftrait ReactRootHost
-            .render! $ :: 'Fn $ {}
-              :args $ [] 'reacher.core/ReactRootHost 'JsObject
-              :return 'Unit
+            .render! $ quote $ Fn reacher.core/ReactRootHost JsObject (-> Unit)
           :examples $ []
           :ffi $ {} (:backend :js) (:kind :external-object) (:target :browser)
             :names $ {} $ :render! |render
-          :schema $ :: 'Trait
+          :schema $ quote Trait
         'StateRef $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstruct StateRef (:value 'Dynamic)
-            :setter $ :: 'Fn $ {}
-              :args $ [] 'Dynamic
-              :return 'Unit
+            :setter $ quote $ Fn Dynamic (-> Unit)
           :examples $ []
-          :schema $ :: 'StructDef
+          :schema $ quote StructDef
         'a $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn a (props & children) (create-element |a props children)
           :examples $ []
-          :schema $ :: 'Fn $ {} (:rest 'Dynamic) (:return 'JsObject)
-            :args $ [] 'Dynamic
-            :features $ #{} :js-ffi
+          :schema $ quote $ Fn Dynamic & Dynamic (-> JsObject) (:features :js-ffi)
         'button $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn button (props & children) (create-element |button props children)
           :examples $ []
-          :schema $ :: 'Fn $ {} (:rest 'Dynamic) (:return 'JsObject)
-            :args $ [] 'Dynamic
-            :features $ #{} :js-ffi
+          :schema $ quote $ Fn Dynamic & Dynamic (-> JsObject) (:features :js-ffi)
         'canvas $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn canvas (props & children) (create-element |div props children)
           :examples $ []
-          :schema $ :: 'Fn $ {} (:rest 'Dynamic) (:return 'JsObject)
-            :args $ [] 'Dynamic
-            :features $ #{} :js-ffi
+          :schema $ quote $ Fn Dynamic & Dynamic (-> JsObject) (:features :js-ffi)
         'context-of-dispatch $ %{} 'CodeEntry (:doc |)
           :code $ quote $ def context-of-dispatch (create-dispatch-context)
           :examples $ []
-          :schema $ :: 'JsObject
+          :schema $ quote JsObject
         'create-dispatch-context $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn create-dispatch-context ()
             contract/expect-object |React.createContext $ React/createContext $ fn (op) (println |missing_dispatch_function op)
           :examples $ []
-          :schema $ :: 'Fn $ {} (:return 'JsObject)
-            :args $ []
-            :features $ #{} :js-ffi
+          :schema $ quote $ Fn (-> JsObject) (:features :js-ffi)
         'create-element $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn create-element (tag props children)
             js-ffi.contract/expect-object |React.create-element $ React/createElement (reacher.util.str/scalar-string tag) (transform-props props) & children
           :examples $ []
-          :schema $ :: 'Fn $ {} (:return 'JsObject)
-            :args $ [] 'Dynamic 'Dynamic $ :: 'List 'Dynamic
-            :features $ #{} :js-ffi
+          :schema $ quote $ Fn Dynamic Dynamic (List Dynamic) (-> JsObject) (:features :js-ffi)
         'dispatch-provider $ %{} 'CodeEntry (:doc |)
           :code $ quote $ def dispatch-provider
             contract/expect-object |React.Context.Provider $ contract/object-field |React.Context context-of-dispatch |Provider
           :examples $ []
-          :schema $ :: 'JsObject
+          :schema $ quote JsObject
         'div $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn div (props & children) (create-element |div props children)
           :examples $ []
-          :schema $ :: 'Fn $ {} (:rest 'Dynamic) (:return 'JsObject)
-            :args $ [] 'Dynamic
-            :features $ #{} :js-ffi
+          :schema $ quote $ Fn Dynamic & Dynamic (-> JsObject) (:features :js-ffi)
         'img $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn img (props & children) (create-element |img props children)
           :examples $ []
-          :schema $ :: 'Fn $ {} (:rest 'Dynamic) (:return 'JsObject)
-            :args $ [] 'Dynamic
-            :features $ #{} :js-ffi
+          :schema $ quote $ Fn Dynamic & Dynamic (-> JsObject) (:features :js-ffi)
         'input $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn input (props & children) (create-element |input props children)
           :examples $ []
-          :schema $ :: 'Fn $ {} (:rest 'Dynamic) (:return 'JsObject)
-            :args $ [] 'Dynamic
-            :features $ #{} :js-ffi
+          :schema $ quote $ Fn Dynamic & Dynamic (-> JsObject) (:features :js-ffi)
         'map-strip-keyword $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn map-strip-keyword (xs)
             .map xs $ fn (x)
-              hint-fn $ {} (:return 'String)
-                :args $ [] 'Tag
+              hint-fn $ Fn Tag $ -> String
               if (tag? x) (to-string x) x
           :examples $ []
-          :schema $ :: 'Fn $ {}
-            :args $ [] $ :: 'List 'Tag
-            :return $ :: 'List 'String
+          :schema $ quote $ Fn (List Tag)
+            -> $ List String
         'object-keys-host $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn object-keys-host (value)
             js-cast (js/Object.keys value) 'reacher.core/JsKeyArrayHost
           :examples $ []
-          :schema $ :: 'Fn $ {} (:return 'reacher.core/JsKeyArrayHost)
-            :args $ [] 'JsObject
-            :features $ #{} :js-ffi
+          :schema $ quote $ Fn JsObject (-> reacher.core/JsKeyArrayHost) (:features :js-ffi)
         'pre $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn pre (props & children) (create-element |pre props children)
           :examples $ []
-          :schema $ :: 'Fn $ {} (:rest 'Dynamic) (:return 'JsObject)
-            :args $ [] 'Dynamic
-            :features $ #{} :js-ffi
+          :schema $ quote $ Fn Dynamic & Dynamic (-> JsObject) (:features :js-ffi)
         'props-equal $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn props-equal (prev next)
             let
@@ -459,41 +398,29 @@
                     = (aget prev k) (aget next k)
                 , false
           :examples $ []
-          :schema $ :: 'Fn $ {} (:return 'Bool)
-            :args $ [] 'JsObject 'JsObject
-            :features $ #{} :js-ffi
+          :schema $ quote $ Fn JsObject JsObject (-> Bool) (:features :js-ffi)
         're-memo $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn re-memo (c)
             js-ffi.contract/expect-object |React.re-memo $ React/memo c props-equal
           :examples $ []
-          :schema $ :: 'Fn $ {} (:return 'JsObject)
-            :args $ [] 'Fn
-            :features $ #{} :js-ffi
+          :schema $ quote $ Fn Fn (-> JsObject) (:features :js-ffi)
         'render! $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn render! (target el) (ReactDOM/render el target) &unit
           :examples $ []
-          :schema $ :: 'Fn $ {} (:return 'Unit)
-            :args $ [] 'JsObject 'JsObject
-            :features $ #{} :js-ffi
+          :schema $ quote $ Fn JsObject JsObject (-> Unit) (:features :js-ffi)
         'span $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn span (props & children) (create-element |span props children)
           :examples $ []
-          :schema $ :: 'Fn $ {} (:rest 'Dynamic) (:return 'JsObject)
-            :args $ [] 'Dynamic
-            :features $ #{} :js-ffi
+          :schema $ quote $ Fn Dynamic & Dynamic (-> JsObject) (:features :js-ffi)
         'tag* $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn tag* (name props & children)
             create-element (reacher.util.str/scalar-string name) props children
           :examples $ []
-          :schema $ :: 'Fn $ {} (:rest 'Dynamic) (:return 'JsObject)
-            :args $ [] 'Dynamic 'Dynamic
-            :features $ #{} :js-ffi
+          :schema $ quote $ Fn Dynamic Dynamic & Dynamic (-> JsObject) (:features :js-ffi)
         'textarea $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn textarea (props & children) (create-element |textarea props children)
           :examples $ []
-          :schema $ :: 'Fn $ {} (:rest 'Dynamic) (:return 'JsObject)
-            :args $ [] 'Dynamic
-            :features $ #{} :js-ffi
+          :schema $ quote $ Fn Dynamic & Dynamic (-> JsObject) (:features :js-ffi)
         'transform-props $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn transform-props (props)
             js-ffi.contract/expect-object |React.transform-props $ if (nil? props) (&js-object)
@@ -501,9 +428,7 @@
                   typed-props $ decode-map-as props $ :: 'Map 'Tag 'Dynamic
                 -> typed-props
                   filter-map-kv $ fn (k v)
-                    hint-fn $ {}
-                      :args $ [] 'Tag 'Dynamic
-                      :return $ :: 'MapEntryDecision 'String 'Dynamic
+                    hint-fn $ Fn Tag Dynamic $ -> (MapEntryDecision String Dynamic)
                     if (= :style k)
                       MapEntryDecision :keep |style $ let
                           s $ decode-map-as
@@ -511,9 +436,7 @@
                             :: 'Map 'Tag 'Dynamic
                         if (empty? s) | $ -> s
                           filter-map-kv $ fn (style-key style-value)
-                            hint-fn $ {}
-                              :args $ [] 'Tag 'Dynamic
-                              :return $ :: 'MapEntryDecision 'String 'String
+                            hint-fn $ Fn Tag Dynamic $ -> (MapEntryDecision String String)
                             let
                                 prop $ dashed->camel $ reacher.util.str/scalar-string style-key
                               MapEntryDecision :keep prop $ get-style-value style-value prop
@@ -523,9 +446,7 @@
                         if (fn? v) v $ reacher.util.str/scalar-string v
                   to-js-data
           :examples $ []
-          :schema $ :: 'Fn $ {} (:return 'JsObject)
-            :args $ [] 'Dynamic
-            :features $ #{} :js-ffi
+          :schema $ quote $ Fn Dynamic (-> JsObject) (:features :js-ffi)
         'use-atom $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn use-atom (v)
             let
@@ -533,40 +454,31 @@
                 state $ aget xs 0
                 setter $ unsafe-coerce
                   contract/expect-function |React.useState[1] $ aget xs 1
-                  :: 'Fn $ {}
-                    :args $ [] 'Dynamic
-                    :return 'Unit
+                  quote $ Fn Dynamic $ -> Unit
               StateRef :value state :setter setter
           :examples $ []
-          :schema $ :: 'Fn $ {} (:return 'reacher.core/StateRef)
-            :args $ [] 'Dynamic
-            :features $ #{} :js-ffi
+          :schema $ quote $ Fn Dynamic (-> reacher.core/StateRef) (:features :js-ffi)
         'use-dispatch $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn use-dispatch ()
             let
                 value $ React/useContext context-of-dispatch
               if (fn? value) value $ raise "|React dispatch context expects a function"
           :examples $ []
-          :schema $ :: 'Fn $ {} (:return 'Fn)
-            :args $ []
-            :features $ #{} :js-ffi
+          :schema $ quote $ Fn (-> Fn) (:features :js-ffi)
         'use-effect! $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn use-effect! (params f)
             React/useEffect f $ to-js-data params
             , &unit
           :examples $ []
-          :schema $ :: 'Fn $ {} (:return 'Unit)
-            :args $ [] (:: 'List 'Dynamic)
-              :: 'Fn $ {} (:return 'Unit)
-                :args $ []
-            :features $ #{} :js-ffi
+          :schema $ quote $ Fn (List Dynamic)
+            Fn $ -> Unit
+            -> Unit
+            :features :js-ffi
         'wrap-comp $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn wrap-comp (f props & children)
             js-ffi.contract/expect-object |React.wrap-comp $ React/createElement f props & children
           :examples $ []
-          :schema $ :: 'Fn $ {} (:rest 'Dynamic) (:return 'JsObject)
-            :args $ [] 'Dynamic 'Dynamic
-            :features $ #{} :js-ffi
+          :schema $ quote $ Fn Dynamic Dynamic & Dynamic (-> JsObject) (:features :js-ffi)
       :ns $ %{} 'NsEntry (:doc |)
         :code $ quote $ ns reacher.core
           :require (|react :as React) (|react-dom :as ReactDOM)
@@ -580,9 +492,7 @@
                 target $ contract/expect-object |event.target $ contract/object-field |event event |target
               contract/expect-string |event.target.value $ contract/object-field |event.target target |value
           :examples $ []
-          :schema $ :: 'Fn $ {} (:return 'String)
-            :args $ [] 'Dynamic
-            :features $ #{} :js-ffi
+          :schema $ quote $ Fn Dynamic (-> String) (:features :js-ffi)
         'read-store-prop $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn read-store-prop (props)
             let
@@ -592,9 +502,7 @@
                   _ _ $ raise |JS_FFI_contract_violation:_component.props.store_expected_Store
                 raise |JS_FFI_contract_violation:_component.props.store_expected_Store
           :examples $ []
-          :schema $ :: 'Fn $ {} (:return 'reacher.app.schema/Store)
-            :args $ [] $ :: 'JsNullish 'JsObject
-            :features $ #{} :js-ffi
+          :schema $ quote $ Fn (JsNullish JsObject) (-> reacher.app.schema/Store) (:features :js-ffi)
           :tests $ [] $ %{} 'TestEntry (:name |reject-task-as-store)
             :code $ quote $ calcit.test/is-throws
               read-store-prop $ js-object $ :store
@@ -608,9 +516,7 @@
                   _ _ $ raise |JS_FFI_contract_violation:_component.props.task_expected_Task
                 raise |JS_FFI_contract_violation:_component.props.task_expected_Task
           :examples $ []
-          :schema $ :: 'Fn $ {} (:return 'reacher.app.schema/Task)
-            :args $ [] $ :: 'JsNullish 'JsObject
-            :features $ #{} :js-ffi
+          :schema $ quote $ Fn (JsNullish JsObject) (-> reacher.app.schema/Task) (:features :js-ffi)
           :tests $ [] $ %{} 'TestEntry (:name |reject-store-as-task)
             :code $ quote $ calcit.test/is-throws
               read-task-prop $ js-object $ :task
@@ -622,32 +528,26 @@
       :defs $ {}
         'RegexHost $ %{} 'CodeEntry (:doc |)
           :code $ quote $ deftrait RegexHost
-            .test $ :: 'Fn $ {}
-              :args $ [] 'reacher.util.str/RegexHost 'String
-              :return 'Bool
+            .test $ quote $ Fn reacher.util.str/RegexHost String (-> Bool)
           :examples $ []
           :ffi $ {} (:backend :js) (:kind :external-object) (:target :browser)
             :names $ {} $ :test |test
-          :schema $ :: 'Trait
+          :schema $ quote Trait
         'create-regex-host $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn create-regex-host (pattern flags)
             js-cast (new js/RegExp pattern flags) 'reacher.util.str/RegexHost
           :examples $ []
-          :schema $ :: 'Fn $ {} (:return 'reacher.util.str/RegexHost)
-            :args $ [] 'String 'String
-            :features $ #{} :js-ffi
+          :schema $ quote $ Fn String String (-> reacher.util.str/RegexHost) (:features :js-ffi)
         'dashed->camel $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn dashed->camel (x)
             contract/expect-string |String.replace $ .!replace x dashed-letter-pattern $ fn (cc pos prop)
               .!toUpperCase $ contract/expect-string |dashed-letter $ aget cc 1
           :examples $ []
-          :schema $ :: 'Fn $ {} (:return 'String)
-            :args $ [] 'String
-            :features $ #{} :js-ffi
+          :schema $ quote $ Fn String (-> String) (:features :js-ffi)
         'dashed-letter-pattern $ %{} 'CodeEntry (:doc |)
           :code $ quote $ def dashed-letter-pattern (create-regex-host |-[a-z] |g)
           :examples $ []
-          :schema $ :: 'reacher.util.str/RegexHost
+          :schema $ quote reacher.util.str/RegexHost
         'escape-html $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn escape-html (text)
             let
@@ -656,9 +556,7 @@
                 c $ contract/expect-string |escape.gt $ .!replace b |> |&gt;
               contract/expect-string |escape.newline $ .!replace c &newline |&#13;&#10;
           :examples $ []
-          :schema $ :: 'Fn $ {} (:return 'String)
-            :args $ [] 'String
-            :features $ #{} :js-ffi
+          :schema $ quote $ Fn String (-> String) (:features :js-ffi)
         'get-style-value $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn get-style-value (x prop)
             cond
@@ -669,14 +567,12 @@
                 if (pattern-non-dimension-props .test prop) (str x) (str x |px)
               true $ str x
           :examples $ []
-          :schema $ :: 'Fn $ {} (:return 'String)
-            :args $ [] 'Dynamic 'String
-            :features $ #{} :js-ffi
+          :schema $ quote $ Fn Dynamic String (-> String) (:features :js-ffi)
         'pattern-non-dimension-props $ %{} 'CodeEntry (:doc |)
           :code $ quote $ def pattern-non-dimension-props
             create-regex-host "|acit|ex(?:s|g|n|p|$)|rph|grid|ows|mnc|ntw|ine[ch]|zoo|^ord|itera" |i
           :examples $ []
-          :schema $ :: 'reacher.util.str/RegexHost
+          :schema $ quote reacher.util.str/RegexHost
         'scalar-string $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn scalar-string (value)
             match (data-view value)
@@ -688,14 +584,12 @@
               (:symbol sym) (to-string sym)
               _ $ raise "|expected scalar text"
           :examples $ []
-          :schema $ :: 'Fn $ {} (:return 'String)
-            :args $ [] 'Dynamic
+          :schema $ quote $ Fn Dynamic (-> String)
         'style->string $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn style->string (styles)
             -> (&map:to-list styles)
               .map $ fn (entry)
-                hint-fn $ {} (:return 'String)
-                  :args $ [] $ :: 'List 'Dynamic
+                hint-fn $ Fn (List Dynamic) (-> String)
                 let
                     k $ .unwrap $ first entry
                     style-name $ reacher.util.str/scalar-string $ decode-map-as k 'Tag
@@ -705,9 +599,7 @@
                   str style-name |: (escape-html v) |;
               join-string |
           :examples $ []
-          :schema $ :: 'Fn $ {} (:return 'String)
-            :args $ [] $ :: 'Map 'Tag 'V
-            :generics $ [] 'V
+          :schema $ quote $ Fn (Map Tag V) (-> String) (:generics V)
       :ns $ %{} 'NsEntry (:doc |)
         :code $ quote $ ns reacher.util.str
           :require $ js-ffi.contract :as contract

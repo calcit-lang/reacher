@@ -4,8 +4,8 @@ Reacher: React.js in calcit-js
 
 Demo https://repo.calcit-lang.org/reacher/ .
 
-使用者注意：本轮保持正式 Calcit CLI / `@calcit/procs` **0.31.0**，
-配对 UI **0.9.0-alpha.4** / JS-FFI **0.2.7**；请同步完整依赖图、重新生成 JS 并完整刷新页面，不混装旧 alpha。
+使用者注意：本轮保持正式 Calcit CLI / `@calcit/procs` **0.32.1**，
+配对 UI **0.9.0** / JS-FFI **0.2.9**；请同步完整依赖图、重新生成 JS 并完整刷新页面，不混装旧 alpha。
 这次修复升级后“新建任务刷新即被拒绝”的存档恢复问题：序列化 Struct 不保留本地名义来源，
 恢复入口将 Struct 作为 wire 数据转为 Map，检查 id/time/done?/text 全部字段，随后构造本地 Task/Store。
 名称不是身份或授权；组件 props 的名义类型检查保持不变，不接受错误类型冒充 Task/Store。
@@ -20,28 +20,27 @@ Demo 先读取/恢复存档，再首次渲染和注册 watch/离页保存：解�
 
 ```cirru.no-check
 div
-  {} (:style ({}))
-  div ({})
+  {} $ :style $ {}
+  div $ {}
 
-tag* :div
-  {} (:style ({}))
+tag* :div $ {} $ :style ({})
 ```
 
 ```cirru.no-check
-render! mount-target (wrap-comp C props child)
+render! mount-target $ wrap-comp C props child
 ```
 
 ```cirru.no-check
-use-effect! ([] :a :b) $ fn ()
-  println |effect
+use-effect! ([] :a :b)
+  fn () $ println |effect
 ```
 
 ```cirru.no-check
 let
     *r $ use-atom |demo
   println $ :value *r
-  div $ {}
-    :on-click $ fn (event)
+  div $ {} $ :on-click
+    fn (event)
       let
           setter $ :setter *r
         setter |another
@@ -59,11 +58,13 @@ re-memo comp-task
 
 ```cirru.no-check
 ; Provider
+
 wrap-comp dispatch-provider
   js-object $ "\"value" dispatch!
   wrap-comp comp-container @*store
 
 ; Consumer
+
 let
     d! $ use-dispatch
   d! op data
@@ -75,9 +76,14 @@ https://github.com/calcit-lang/respo-calcit-workflow
 
 ### Calcit 与 COS/CDN
 
-本轮保持正式 Calcit / `@calcit/procs` `0.31.0`；
-模块依赖为已发布的 Respo UI `0.9.0-alpha.4`、JS-FFI `0.2.7`。UI 对应 0.31.0 的已发布 tag 仍为 alpha，
-传递依赖为 Respo `0.17.0-alpha.4`、Router `0.9.0-alpha.3`；没有引入 Git hash。
+本轮使用正式 Calcit / `@calcit/procs` `0.32.1`；
+模块依赖为已发布的 Respo UI `0.9.0`、JS-FFI `0.2.9`。UI 的传递依赖仍包含
+已发布 Router `0.9.0-alpha.4`，没有引入 Git hash，也不宣称整个依赖图均为正式版本。
+本轮已通过原 all-defs/完整 strict、FFI 回归、不可变安装、文档检查与构建，
+实际首屏和刷新控制台无 warn/error；未复验任务创建、存档恢复、HMR。
+类型标注通过官方 formatter 更新到 0.32 语法；原公开合同、附带测试、React setter 身份、
+存档解码和 HUD 行为保持，不新增强转或放宽门禁。原存档浏览器验收属于此前迁移，
+不能视为本次 0.32.1 的复验。
 CI 使用 `caps --strict --ci` 验证，不再允许版本选择警告。
 CI 检查规范快照、全部定义和现有 FFI 测试，完整 strict 要求 passed 且 diagnostics 为空；
 不再调用硬编码 fix preset 或重复输出类型统计。
