@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 
 import * as calcit from "../js-out/calcit.core.mjs";
+import { map_strip_keyword } from "../js-out/reacher.core.mjs";
 import { Store, Task, decode_store } from "../js-out/reacher.app.schema.mjs";
 import {
   read_input_value,
@@ -9,6 +10,12 @@ import {
 } from "../js-out/reacher.ffi.mjs";
 
 const tags = calcit.init_tags(["tasks", "id", "time", "done?", "text"]);
+assert.deepEqual(
+  calcit.to_js_data(map_strip_keyword(calcit._$L_(tags.id, "名称", tags.id))),
+  ["id", "名称", "id"],
+);
+assert.deepEqual(calcit.to_js_data(map_strip_keyword(calcit._$L_())), []);
+
 const task = calcit._$n__PCT__$M_(
   Task,
   tags.id,

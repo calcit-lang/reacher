@@ -7,6 +7,9 @@ Demo https://repo.calcit-lang.org/reacher/ .
 升级到 Calcit 和 `@calcit/procs` **0.34.1** 后，请重新生成前端 JS 并刷新页面。Respo UI 升级到 0.12.0，基础样式可能变化。
 
 `map-strip-keyword` 接受 Tag 与字符串组成的混合列表，按原顺序返回字符串。直接从 JS 调用的代码也应只传这两种元素。React props 和旧存档继续在入口检查。
+
+如果页面提示 `Ignored_invalid_saved_state`，说明 EDN 能解析，但内容未通过 Store 校验。请在离开或刷新页面前备份原始存档，离页保存可能用默认状态覆盖它。
+
 发布与否以同名正式 tag 为准，源码版本号不是发布证据。
 
 ### Usages
