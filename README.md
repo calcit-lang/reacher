@@ -4,16 +4,9 @@ Reacher: React.js in calcit-js
 
 Demo https://repo.calcit-lang.org/reacher/ .
 
-使用者注意：本轮保持正式 Calcit CLI / `@calcit/procs` **0.32.1**，
-配对 UI **0.9.0** / JS-FFI **0.2.9**；请同步完整依赖图、重新生成 JS 并完整刷新页面，不混装旧 alpha。
-这次修复升级后“新建任务刷新即被拒绝”的存档恢复问题：序列化 Struct 不保留本地名义来源，
-恢复入口将 Struct 作为 wire 数据转为 Map，检查 id/time/done?/text 全部字段，随后构造本地 Task/Store。
-名称不是身份或授权；组件 props 的名义类型检查保持不变，不接受错误类型冒充 Task/Store。
-原 FFI 测试补充真实序列化往返及非法字段拒绝，浏览器已验证任务和完成状态刷新恢复。
-React 18、公开组件 API、状态/存储格式及 setter 身份不变；UI 基础样式可能变化。
-Demo 先读取/恢复存档，再首次渲染和注册 watch/离页保存：解析抛错时不再留下
-会覆盖原存档的保存回调。合法 EDN 但不符合 Store 的值仍按原逻辑显示 HUD，
-本次不改变该分支的既定处理策略，也不承诺这种值会在离页后保留。
+升级到 Calcit 和 `@calcit/procs` **0.34.1** 后，请重新生成前端 JS 并刷新页面。Respo UI 升级到 0.12.0，基础样式可能变化。
+
+`map-strip-keyword` 接受 Tag 与字符串组成的混合列表，按原顺序返回字符串。直接从 JS 调用的代码也应只传这两种元素。React props 和旧存档继续在入口检查。
 发布与否以同名正式 tag 为准，源码版本号不是发布证据。
 
 ### Usages
@@ -76,14 +69,8 @@ https://github.com/calcit-lang/respo-calcit-workflow
 
 ### Calcit 与 COS/CDN
 
-本轮使用正式 Calcit / `@calcit/procs` `0.32.1`；
-模块依赖为已发布的 Respo UI `0.9.0`、JS-FFI `0.2.9`。UI 的传递依赖仍包含
-已发布 Router `0.9.0-alpha.4`，没有引入 Git hash，也不宣称整个依赖图均为正式版本。
-本轮已通过原 all-defs/完整 strict、FFI 回归、不可变安装、文档检查与构建，
-实际首屏和刷新控制台无 warn/error；未复验任务创建、存档恢复、HMR。
-类型标注通过官方 formatter 更新到 0.32 语法；原公开合同、附带测试、React setter 身份、
-存档解码和 HUD 行为保持，不新增强转或放宽门禁。原存档浏览器验收属于此前迁移，
-不能视为本次 0.32.1 的复验。
+Calcit 与 JS 运行时使用 0.34.1，模块图使用 Respo UI 0.12.0、Respo 0.18.0、Router 0.10.0 和 JS-FFI 0.2.9。
+
 CI 使用 `caps --strict --ci` 验证，不再允许版本选择警告。
 CI 检查规范快照、全部定义和现有 FFI 测试，完整 strict 要求 passed 且 diagnostics 为空；
 不再调用硬编码 fix preset 或重复输出类型统计。
@@ -105,8 +92,6 @@ React FFI 强转，不用每次 render 新建的闭包替代。原状态、child
 最新 CI/review、真实浏览器和消费者验收。本轮清理七处 Option 调用/函数引用及十一处
 Map/List 写法，保留原解析、decode/hydrate、HUD 和异常传播，不修改公开 schema。
 单参数的样式 merge 直接移除；Option 方法作为高阶函数参数时使用具体回调合同，保留 None 短路顺序。
-`map-strip-keyword` 保留原 Tag 转字符串及非 Tag 透传分支，公开
-`List<Tag> -> List<String>` 合同不变；本轮不重新定义混合输入的 API 边界。
 现有 Node FFI 入口保留六项断言，并执行原两项附带测试对应的 Task/Store 互换拒绝案例；
 不新增测试脚本，不把 JS 宿主测试冒充 native 运行。本轮不覆盖旧 tag 或抢先发版。
 正式 Linux CI 不代表所有平台均已验收或均有正式预编译 CLI；本地原 alpha 基线不是正式验收。
