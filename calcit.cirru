@@ -92,7 +92,7 @@
     'reacher.app.config $ %{} 'FileEntry
       :defs $ {}
         'Site $ %{} 'CodeEntry (:doc |)
-          :code $ quote $ defstruct Site (:storage-key 'String)
+          :code $ quote $ defstruct Site (:storage-key String)
           :examples $ []
           :schema $ quote StructDef
         'dev? $ %{} 'CodeEntry (:doc |)
@@ -204,7 +204,7 @@
     'reacher.app.schema $ %{} 'FileEntry
       :defs $ {}
         'Op $ %{} 'CodeEntry (:doc |)
-          :code $ quote $ defenum Op (:add-task 'String) (:rm-task 'String) (:toggle-task 'String) (:hydrate-storage 'reacher.app.schema/Store)
+          :code $ quote $ defenum Op (:add-task String) (:rm-task String) (:toggle-task String) (:hydrate-storage reacher.app.schema/Store)
           :examples $ []
           :schema $ quote EnumDef
         'Store $ %{} 'CodeEntry (:doc |)
@@ -213,7 +213,7 @@
           :examples $ []
           :schema $ quote StructDef
         'Task $ %{} 'CodeEntry (:doc |)
-          :code $ quote $ defstruct Task (:id 'String) (:time 'Number) (:done? 'Bool) (:text 'String)
+          :code $ quote $ defstruct Task (:id String) (:time Number) (:done? Bool) (:text String)
           :examples $ []
           :schema $ quote StructDef
         'decode-store $ %{} 'CodeEntry
@@ -314,6 +314,10 @@
           :ffi $ {} (:backend :js) (:kind :external-object) (:target :browser)
             :names $ {} (:every |every) (:includes |includes)
           :schema $ quote Trait
+        'KeywordOrString $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defunion KeywordOrString Tag String
+          :examples $ []
+          :schema $ quote UnionDef
         'ReactRootHost $ %{} 'CodeEntry (:doc |)
           :code $ quote $ deftrait ReactRootHost
             .render! $ quote $ Fn reacher.core/ReactRootHost JsObject (-> Unit)
@@ -322,7 +326,7 @@
             :names $ {} $ :render! |render
           :schema $ quote Trait
         'StateRef $ %{} 'CodeEntry (:doc |)
-          :code $ quote $ defstruct StateRef (:value 'Dynamic)
+          :code $ quote $ defstruct StateRef (:value Dynamic)
             :setter $ quote $ Fn Dynamic (-> Unit)
           :examples $ []
           :schema $ quote StructDef
@@ -372,10 +376,12 @@
         'map-strip-keyword $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn map-strip-keyword (xs)
             .map xs $ fn (x)
-              hint-fn $ Fn Tag $ -> String
-              if (tag? x) (to-string x) x
+              hint-fn $ Fn reacher.core/KeywordOrString $ -> String
+              match x
+                (Tag k) (to-string k)
+                (String text) text
           :examples $ []
-          :schema $ quote $ Fn (List Tag)
+          :schema $ quote $ Fn (List reacher.core/KeywordOrString)
             -> $ List String
         'object-keys-host $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn object-keys-host (value)
@@ -425,7 +431,7 @@
           :code $ quote $ defn transform-props (props)
             js-ffi.contract/expect-object |React.transform-props $ if (nil? props) (&js-object)
               let
-                  typed-props $ decode-map-as props $ :: 'Map 'Tag 'Dynamic
+                  typed-props $ decode-map-as props $ quote (Map Tag Dynamic)
                 -> typed-props
                   filter-map-kv $ fn (k v)
                     hint-fn $ Fn Tag Dynamic $ -> (MapEntryDecision String Dynamic)
@@ -433,7 +439,7 @@
                       MapEntryDecision :keep |style $ let
                           s $ decode-map-as
                             .unwrap-or (get typed-props :style) ({})
-                            :: 'Map 'Tag 'Dynamic
+                            quote $ Map Tag Dynamic
                         if (empty? s) | $ -> s
                           filter-map-kv $ fn (style-key style-value)
                             hint-fn $ Fn Tag Dynamic $ -> (MapEntryDecision String String)
