@@ -133,7 +133,7 @@
             if config/dev? $ load-console-formatter!
             try
               match
-                browser/storage-get $ :storage-key config/site
+                js-nullish->option $ .get-item (browser/window-local-storage) (:storage-key config/site)
                 (:some raw)
                   match
                     schema/decode-store $ parse-cirru-edn raw

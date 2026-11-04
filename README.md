@@ -8,9 +8,11 @@ Demo https://repo.calcit-lang.org/reacher/ .
 
 `map-strip-keyword` 接受 Tag 与字符串组成的混合列表，按原顺序返回字符串。直接从 JS 调用的代码也应只传这两种元素。React props 和旧存档继续在入口检查。
 
-如果存档解析或 Store 校验失败，页面通过 `hud!` 显示错误并中止启动，
+如果存档读取、解析或 Store 校验失败，页面通过 `hud!` 显示错误并中止启动，
 不渲染默认状态、不注册 watch 或离页保存，保留原文。请备份并修复原存档后重新加载；
 修复前页面不会继续使用默认状态运行。空存档和合法存档仍按原逻辑启动、恢复和保存。
+启动读取使用已有的 `window-local-storage` / `StorageHost.get-item` 受检接口，
+只把真正缺失的 key 作为空存档；不会用会吞读取异常的 `storage-get` 判断是否存在旧数据。
 
 发布与否以同名正式 tag 为准，源码版本号不是发布证据。
 
