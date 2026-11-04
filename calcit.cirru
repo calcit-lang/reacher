@@ -131,15 +131,22 @@
           :code $ quote $ defn main! ()
             println |Running_mode: $ if config/dev? |dev |release
             if config/dev? $ load-console-formatter!
-            match
-              browser/storage-get $ :storage-key config/site
-              (:some raw)
-                match
-                  schema/decode-store $ parse-cirru-edn raw
-                  (:some stored)
-                    dispatch! $ schema/Op :hydrate-storage stored
-                  (:none) (hud! |error |Ignored_invalid_saved_state)
-              (:none) &unit
+            try
+              match
+                js-nullish->option $ .get-item (browser/window-local-storage) (:storage-key config/site)
+                (:some raw)
+                  match
+                    schema/decode-store $ parse-cirru-edn raw
+                    (:some stored)
+                      dispatch! $ schema/Op :hydrate-storage stored
+                    (:none)
+                      raise "|Invalid saved state; original storage preserved."
+                (:none) &unit
+              fn (error)
+                let
+                    message $ :message $ shared/normalize-error error
+                  hud! |error message
+                  raise message
             render-app!
             add-watch! *store :changes $ fn (s prev) (render-app!)
             browser/set-before-unload! $ fn (event) (persist-storage!)
@@ -595,13 +602,10 @@
           :code $ quote $ defn style->string (styles)
             -> (&map:to-list styles)
               .map $ fn (entry)
-                hint-fn $ Fn (List Dynamic) (-> String)
-                let
-                    k $ .unwrap $ first entry
+                hint-fn $ Fn (Tuple Tag V) (-> String)
+                let[] (k value) entry $ let
                     style-name $ reacher.util.str/scalar-string $ decode-map-as k 'Tag
-                    v $ dbg $ get-style-value
-                      .unwrap $ last entry
-                      dashed->camel style-name
+                    v $ dbg $ get-style-value value (dashed->camel style-name)
                   str style-name |: (escape-html v) |;
               join-string |
           :examples $ []

@@ -4,11 +4,15 @@ Reacher: React.js in calcit-js
 
 Demo https://repo.calcit-lang.org/reacher/ .
 
-升级到 Calcit 和 `@calcit/procs` **0.34.1** 后，请重新生成前端 JS 并刷新页面。Respo UI 升级到 0.12.0，基础样式可能变化。
+升级到 Calcit 和 `@calcit/procs` **0.34.2** 后，请重新生成前端 JS 并刷新页面。Respo UI 使用同系列正式补丁 0.12.1，基础样式可能变化。
 
 `map-strip-keyword` 接受 Tag 与字符串组成的混合列表，按原顺序返回字符串。直接从 JS 调用的代码也应只传这两种元素。React props 和旧存档继续在入口检查。
 
-如果页面提示 `Ignored_invalid_saved_state`，说明 EDN 能解析，但内容未通过 Store 校验。请在离开或刷新页面前备份原始存档，离页保存可能用默认状态覆盖它。
+如果存档读取、解析或 Store 校验失败，页面通过 `hud!` 显示错误并中止启动，
+不渲染默认状态、不注册 watch 或离页保存，保留原文。请备份并修复原存档后重新加载；
+修复前页面不会继续使用默认状态运行。空存档和合法存档仍按原逻辑启动、恢复和保存。
+启动读取使用已有的 `window-local-storage` / `StorageHost.get-item` 受检接口，
+只把真正缺失的 key 作为空存档；不会用会吞读取异常的 `storage-get` 判断是否存在旧数据。
 
 发布与否以同名正式 tag 为准，源码版本号不是发布证据。
 
@@ -72,7 +76,12 @@ https://github.com/calcit-lang/respo-calcit-workflow
 
 ### Calcit 与 COS/CDN
 
-Calcit 与 JS 运行时使用 0.34.1，模块图使用 Respo UI 0.12.0、Respo 0.18.0、Router 0.10.0 和 JS-FFI 0.2.9。
+Calcit 与 JS 运行时使用 0.34.2，模块图使用 Respo UI 0.12.1、Respo 0.18.1、Router 0.10.1 和 JS-FFI 0.2.9。
+
+样式转换接收当前 Map pair 的 `Tuple Tag V`，用 `let[]` 分别读取 key/value，
+不再把异构 pair 声明成 `List Dynamic`。保留原 Tag key 检查、文本转义、数值单位与顺序。
+现有 Tag/String 混合列表 union 保持；React 的开放 props/children 与原 setter 身份保持，
+不为压低 Dynamic 统计收窄公共边界，不新增强转或放宽门禁。
 
 CI 使用 `caps --strict --ci` 验证，不再允许版本选择警告。
 CI 检查规范快照、全部定义和现有 FFI 测试，完整 strict 要求 passed 且 diagnostics 为空；
