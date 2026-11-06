@@ -4,7 +4,7 @@ Reacher: React.js in calcit-js
 
 Demo https://repo.calcit-lang.org/reacher/ .
 
-升级到 Calcit 和 `@calcit/procs` **0.34.2** 后，请重新生成前端 JS 并刷新页面。Respo UI 使用同系列正式补丁 0.12.1，基础样式可能变化。
+升级到 Calcit 和 `@calcit/procs` **0.35.1** 后，请重新生成前端 JS 并刷新页面。Respo UI 使用同系列正式补丁 0.15.1，基础样式可能变化。
 
 `map-strip-keyword` 接受 Tag 与字符串组成的混合列表，按原顺序返回字符串。直接从 JS 调用的代码也应只传这两种元素。React props 和旧存档继续在入口检查。
 
@@ -76,7 +76,9 @@ https://github.com/calcit-lang/respo-calcit-workflow
 
 ### Calcit 与 COS/CDN
 
-Calcit 与 JS 运行时使用 0.34.2，模块图使用 Respo UI 0.12.1、Respo 0.18.1、Router 0.10.1 和 JS-FFI 0.2.9。
+Calcit 与 JS 运行时使用 0.35.1，模块图使用 Respo UI 0.15.1、Respo 0.19.4、Router 0.12.1 和 JS-FFI 0.2.13。
+
+文字转换核心使用 `TextScalar`（String、Tag、Number、Bool、Symbol）。开放 props 仍在边界验证，已有 nil 转空文本、样式单位和回调身份行为保持。
 
 样式转换接收当前 Map pair 的 `Tuple Tag V`，用 `let[]` 分别读取 key/value，
 不再把异构 pair 声明成 `List Dynamic`。保留原 Tag key 检查、文本转义、数值单位与顺序。
