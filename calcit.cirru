@@ -216,7 +216,7 @@
           :schema $ quote EnumDef
         'Store $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstruct Store
-            :tasks $ quote $ List reacher.app.schema/Task
+            :tasks $ List reacher.app.schema/Task
           :examples $ []
           :schema $ quote StructDef
         'Task $ %{} 'CodeEntry (:doc |)
@@ -254,7 +254,7 @@
                                                     Option :some $ Task :id id :time time :done? done? :text text
                                                     Option :none
                                 (:none) (Option :none)
-                            quote $ Option reacher.app.schema/Task
+                            Option reacher.app.schema/Task
                       if
                         every? decoded-tasks $ fn (task)
                           hint-fn $ Fn (Option reacher.app.schema/Task) (-> Bool)
@@ -263,7 +263,7 @@
                           .map decoded-tasks $ fn (task)
                             hint-fn $ Fn (Option reacher.app.schema/Task) (-> reacher.app.schema/Task)
                             .unwrap task
-                          quote $ List reacher.app.schema/Task
+                          List reacher.app.schema/Task
                         Option :none
                     Option :none
                 (:none) (Option :none)
@@ -313,8 +313,8 @@
           :schema $ quote $ Fn Dynamic Dynamic (-> JsObject) (:features :js-ffi)
         'JsKeyArrayHost $ %{} 'CodeEntry (:doc |)
           :code $ quote $ deftrait JsKeyArrayHost (:length 'Number)
-            .includes $ quote $ Fn reacher.core/JsKeyArrayHost String (-> Bool)
-            .every $ quote $ Fn reacher.core/JsKeyArrayHost
+            .includes $ Fn reacher.core/JsKeyArrayHost String $ -> Bool
+            .every $ Fn reacher.core/JsKeyArrayHost
               Fn String Number reacher.core/JsKeyArrayHost $ -> Bool
               -> Bool
           :examples $ []
@@ -327,14 +327,14 @@
           :schema $ quote UnionDef
         'ReactRootHost $ %{} 'CodeEntry (:doc |)
           :code $ quote $ deftrait ReactRootHost
-            .render! $ quote $ Fn reacher.core/ReactRootHost JsObject (-> Unit)
+            .render! $ Fn reacher.core/ReactRootHost JsObject $ -> Unit
           :examples $ []
           :ffi $ {} (:backend :js) (:kind :external-object) (:target :browser)
             :names $ {} $ :render! |render
           :schema $ quote Trait
         'StateRef $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstruct StateRef (:value Dynamic)
-            :setter $ quote $ Fn Dynamic (-> Unit)
+            :setter $ Fn Dynamic $ -> Unit
           :examples $ []
           :schema $ quote StructDef
         'a $ %{} 'CodeEntry (:doc |)
@@ -438,7 +438,7 @@
           :code $ quote $ defn transform-props (props)
             js-ffi.contract/expect-object |React.transform-props $ if (nil? props) (&js-object)
               let
-                  typed-props $ decode-map-as props $ quote (Map Tag Dynamic)
+                  typed-props $ decode-map-as props $ Map Tag Dynamic
                 -> typed-props
                   filter-map-kv $ fn (k v)
                     hint-fn $ Fn Tag Dynamic $ -> (MapEntryDecision String Dynamic)
@@ -446,16 +446,16 @@
                       MapEntryDecision :keep |style $ let
                           s $ decode-map-as
                             .unwrap-or (get typed-props :style) ({})
-                            quote $ Map Tag Dynamic
+                            Map Tag Dynamic
                         if (empty? s) | $ -> s
                           filter-map-kv $ fn (style-key style-value)
                             hint-fn $ Fn Tag Dynamic $ -> (MapEntryDecision String String)
                             let
-                                prop $ dashed->camel $ reacher.util.str/scalar-string style-key
+                                prop $ dashed->camel $ reacher.util.str/scalar-text style-key
                               MapEntryDecision :keep prop $ get-style-value style-value prop
                           to-js-data
                       MapEntryDecision :keep
-                        dashed->camel $ reacher.util.str/scalar-string k
+                        dashed->camel $ reacher.util.str/scalar-text k
                         if (fn? v) v $ reacher.util.str/scalar-string v
                   to-js-data
           :examples $ []
@@ -467,7 +467,7 @@
                 state $ aget xs 0
                 setter $ unsafe-coerce
                   contract/expect-function |React.useState[1] $ aget xs 1
-                  quote $ Fn Dynamic $ -> Unit
+                  Fn Dynamic $ -> Unit
               StateRef :value state :setter setter
           :examples $ []
           :schema $ quote $ Fn Dynamic (-> reacher.core/StateRef) (:features :js-ffi)
@@ -541,11 +541,15 @@
       :defs $ {}
         'RegexHost $ %{} 'CodeEntry (:doc |)
           :code $ quote $ deftrait RegexHost
-            .test $ quote $ Fn reacher.util.str/RegexHost String (-> Bool)
+            .test $ Fn reacher.util.str/RegexHost String $ -> Bool
           :examples $ []
           :ffi $ {} (:backend :js) (:kind :external-object) (:target :browser)
             :names $ {} $ :test |test
           :schema $ quote Trait
+        'TextScalar $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defunion TextScalar String Tag Number Bool Symbol
+          :examples $ []
+          :schema $ quote UnionDef
         'create-regex-host $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn create-regex-host (pattern flags)
             js-cast (new js/RegExp pattern flags) 'reacher.util.str/RegexHost
@@ -588,23 +592,28 @@
           :schema $ quote reacher.util.str/RegexHost
         'scalar-string $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn scalar-string (value)
-            match (data-view value)
-              (:nil) |
-              (:string text) text
-              (:tag tag) (to-string tag)
-              (:number n) (to-string n)
-              (:bool b) (to-string b)
-              (:symbol sym) (to-string sym)
-              _ $ raise "|expected scalar text"
+            if (nil? value) | $ match (try-decode-map-as value reacher.util.str/TextScalar)
+              (:ok scalar) (scalar-text scalar)
+              (:err _) (raise "|expected scalar text")
           :examples $ []
           :schema $ quote $ Fn Dynamic (-> String)
+        'scalar-text $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defn scalar-text (value)
+            match value
+              (String s) s
+              (Tag x) (to-string x)
+              (Number x) (to-string x)
+              (Bool x) (to-string x)
+              (Symbol x) (to-string x)
+          :examples $ []
+          :schema $ quote $ Fn reacher.util.str/TextScalar (-> String)
         'style->string $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn style->string (styles)
             -> (&map:to-list styles)
               .map $ fn (entry)
                 hint-fn $ Fn (Tuple Tag V) (-> String)
                 let[] (k value) entry $ let
-                    style-name $ reacher.util.str/scalar-string $ decode-map-as k 'Tag
+                    style-name $ reacher.util.str/scalar-text $ decode-map-as k 'Tag
                     v $ dbg $ get-style-value value (dashed->camel style-name)
                   str style-name |: (escape-html v) |;
               join-string |
