@@ -4,9 +4,9 @@ Reacher: React.js in calcit-js
 
 Demo https://repo.calcit-lang.org/reacher/ .
 
-升级到 Calcit 和 `@calcit/procs` **0.35.1** 后，请重新生成前端 JS 并刷新页面。Respo UI 使用同系列正式补丁 0.15.1，基础样式可能变化。
+升级到 Calcit 和 `@calcit/procs` **0.37.0** 后，请重新生成前端 JS 并刷新页面。Respo UI 使用同系列正式补丁 0.15.2，基础样式可能变化。
 
-`map-strip-keyword` 接受 Tag 与字符串组成的混合列表，按原顺序返回字符串。直接从 JS 调用的代码也应只传这两种元素。React props 和旧存档继续在入口检查。
+`map-strip-keyword` 接受 Tag 与字符串组成的混合列表，按原顺序返回字符串。直接从 JS 调用的代码也应只传这两种元素。React props 和旧存档继续在入口检查。使用 `use-dispatch` 的项目需把 entry 的 `:dispatch-op` 绑定到应用的具名操作类型，Provider 和调用方共用该类型。返回的单参数回调转发操作并返回 Unit，每次调用 hook 可返回新的回调引用。
 
 如果存档读取、解析或 Store 校验失败，页面通过 `hud!` 显示错误并中止启动，
 不渲染默认状态、不注册 watch 或离页保存，保留原文。请备份并修复原存档后重新加载；
@@ -67,7 +67,7 @@ wrap-comp dispatch-provider
 
 let
     d! $ use-dispatch
-  d! op data
+  d! $ app.schema/Op :update data
 ```
 
 ### Workflow
@@ -76,7 +76,7 @@ https://github.com/calcit-lang/respo-calcit-workflow
 
 ### Calcit 与 COS/CDN
 
-Calcit 与 JS 运行时使用 0.35.1，模块图使用 Respo UI 0.15.1、Respo 0.19.4、Router 0.12.1 和 JS-FFI 0.2.13。
+Calcit 与 JS 运行时使用 0.37.0，模块图使用 Respo UI 0.15.2、Respo 0.19.5、Router 0.12.2 和 JS-FFI 0.2.13。
 
 文字转换核心使用 `TextScalar`（String、Tag、Number、Bool、Symbol）。开放 props 仍在边界验证，已有 nil 转空文本、样式单位和回调身份行为保持。
 
