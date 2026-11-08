@@ -4,7 +4,9 @@ Reacher: React.js in calcit-js
 
 Demo https://repo.calcit-lang.org/reacher/ .
 
-升级到 Calcit 和 `@calcit/procs` **0.37.0** 后，请重新生成前端 JS 并刷新页面。Respo UI 使用同系列正式补丁 0.15.2，基础样式可能变化。
+升级到 Calcit 和 `@calcit/procs` **0.38.0** 后，请重新生成前端 JS 并刷新页面。Respo UI 使用同系列正式补丁 0.15.2，基础样式可能变化。
+
+React 元素的子节点列表和 `use-effect!` 的依赖列表保留调用方的元素类型。列表传给 React 时沿用原有转换。
 
 `map-strip-keyword` 接受 Tag 与字符串组成的混合列表，按原顺序返回字符串。直接从 JS 调用的代码也应只传这两种元素。React props 和旧存档继续在入口检查。使用 `use-dispatch` 的项目需把 entry 的 `:dispatch-op` 绑定到应用的具名操作类型，Provider 和调用方共用该类型。返回的单参数回调转发操作并返回 Unit，每次调用 hook 可返回新的回调引用。
 
