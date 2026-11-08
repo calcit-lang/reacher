@@ -78,7 +78,7 @@ https://github.com/calcit-lang/respo-calcit-workflow
 
 ### Calcit 与 COS/CDN
 
-Calcit 与 JS 运行时使用 0.37.0，模块图使用 Respo UI 0.15.2、Respo 0.19.5、Router 0.12.2 和 JS-FFI 0.2.13。
+Calcit 与 JS 运行时使用 0.38.0，模块图使用 Respo UI 0.15.2、Respo 0.19.5、Router 0.12.2 和 JS-FFI 0.2.13。
 
 文字转换核心使用 `TextScalar`（String、Tag、Number、Bool、Symbol）。开放 props 仍在边界验证，已有 nil 转空文本、样式单位和回调身份行为保持。
 
@@ -117,7 +117,7 @@ Map/List 写法，保留原解析、decode/hydrate、HUD 和异常传播，不�
 
 生产资源继续使用 `https://cos-sh.tiye.me/calcit-lang/reacher/`；PR 预览路径为
 `calcit-lang/reacher/pr/<PR 编号>/<run ID>/<attempt>/`，Vite 使用同一 CDN base。
-COS Action 固定到正式 v1.2.0，通过 `public-base-url` 启用内置上传校验，
+COS Action 固定到正式 v1.3.0，通过 `public-base-url` 启用内置上传校验，
 不增加额外校验脚本。同一 PR 或生产分支串行排队，不取消正在上传的任务。
 原有服务器部署仅在 main push 执行，资源来源和目标路径保持不变。
 
