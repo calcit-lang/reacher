@@ -369,7 +369,7 @@
           :code $ quote $ defn create-element (tag props children)
             js-ffi.contract/expect-object |React.create-element $ React/createElement (reacher.util.str/scalar-string tag) (transform-props props) & children
           :examples $ []
-          :schema $ quote $ Fn Dynamic Dynamic (List Dynamic) (-> JsObject) (:features :js-ffi)
+          :schema $ quote $ Fn Dynamic Dynamic (List Child) (-> JsObject) (:generics Child) (:features :js-ffi)
         'dispatch-provider $ %{} 'CodeEntry (:doc |)
           :code $ quote $ def dispatch-provider
             contract/expect-object |React.Context.Provider $ contract/object-field |React.Context context-of-dispatch |Provider
@@ -503,9 +503,10 @@
             React/useEffect f $ to-js-data params
             , &unit
           :examples $ []
-          :schema $ quote $ Fn (List Dynamic)
+          :schema $ quote $ Fn (List Dependency)
             Fn $ -> Unit
             -> Unit
+            :generics Dependency
             :features :js-ffi
         'wrap-comp $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn wrap-comp (f props & children)
