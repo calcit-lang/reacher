@@ -6,7 +6,7 @@
     {} (:description |) (:init-fn 'reacher.app.main/main!) (:mode :js) (:reload-fn 'reacher.app.main/reload!) (:target :browser)
       :feature-policy $ {}
       :modules $ [] |respo-ui.calcit/ |js-ffi/
-      :type-slots $ {}
+      :type-slots $ {} $ :dispatch-op 'reacher.app.schema/Op
   :files $ {}
     'reacher.app.comp.container $ %{} 'FileEntry
       :defs $ {}
@@ -27,6 +27,7 @@
                     :placeholder |Content
                     :style ui/input
                     :on-change $ fn (event)
+                      hint-fn $ Fn JsObject $ -> Unit
                       let
                           setter $ :setter *draft
                         setter $ ffi/read-input-value event
@@ -44,7 +45,10 @@
                   hint-fn $ Fn reacher.app.schema/Task $ -> JsObject
                   wrap-comp memod-comp-task $ &js-object :task task :id $ :id task
           :examples $ []
-          :schema $ quote $ Fn (JsNullish JsObject) & Dynamic (-> JsObject) (:features :js-ffi)
+          :schema $ quote $ Fn (JsNullish JsObject)
+            & $ JsNullish JsObject
+            -> JsObject
+            :features :js-ffi
         'comp-task $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn comp-task (props & host-args)
             use-effect!
@@ -74,7 +78,10 @@
                     d! $ schema/Op :rm-task $ :id task
                   , |rm
           :examples $ []
-          :schema $ quote $ Fn (JsNullish JsObject) & Dynamic (-> JsObject) (:features :js-ffi)
+          :schema $ quote $ Fn (JsNullish JsObject)
+            & $ JsNullish JsObject
+            -> JsObject
+            :features :js-ffi
         'memod-comp-task $ %{} 'CodeEntry (:doc |)
           :code $ quote $ def memod-comp-task (re-memo comp-task)
           :examples $ []
@@ -340,15 +347,15 @@
         'a $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn a (props & children) (create-element |a props children)
           :examples $ []
-          :schema $ quote $ Fn Dynamic & Dynamic (-> JsObject) (:features :js-ffi)
+          :schema $ quote $ Fn Dynamic (& Dynamic) (-> JsObject) (:features :js-ffi)
         'button $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn button (props & children) (create-element |button props children)
           :examples $ []
-          :schema $ quote $ Fn Dynamic & Dynamic (-> JsObject) (:features :js-ffi)
+          :schema $ quote $ Fn Dynamic (& Dynamic) (-> JsObject) (:features :js-ffi)
         'canvas $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn canvas (props & children) (create-element |div props children)
           :examples $ []
-          :schema $ quote $ Fn Dynamic & Dynamic (-> JsObject) (:features :js-ffi)
+          :schema $ quote $ Fn Dynamic (& Dynamic) (-> JsObject) (:features :js-ffi)
         'context-of-dispatch $ %{} 'CodeEntry (:doc |)
           :code $ quote $ def context-of-dispatch (create-dispatch-context)
           :examples $ []
@@ -371,15 +378,15 @@
         'div $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn div (props & children) (create-element |div props children)
           :examples $ []
-          :schema $ quote $ Fn Dynamic & Dynamic (-> JsObject) (:features :js-ffi)
+          :schema $ quote $ Fn Dynamic (& Dynamic) (-> JsObject) (:features :js-ffi)
         'img $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn img (props & children) (create-element |img props children)
           :examples $ []
-          :schema $ quote $ Fn Dynamic & Dynamic (-> JsObject) (:features :js-ffi)
+          :schema $ quote $ Fn Dynamic (& Dynamic) (-> JsObject) (:features :js-ffi)
         'input $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn input (props & children) (create-element |input props children)
           :examples $ []
-          :schema $ quote $ Fn Dynamic & Dynamic (-> JsObject) (:features :js-ffi)
+          :schema $ quote $ Fn Dynamic (& Dynamic) (-> JsObject) (:features :js-ffi)
         'map-strip-keyword $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn map-strip-keyword (xs)
             .map xs $ fn (x)
@@ -398,7 +405,7 @@
         'pre $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn pre (props & children) (create-element |pre props children)
           :examples $ []
-          :schema $ quote $ Fn Dynamic & Dynamic (-> JsObject) (:features :js-ffi)
+          :schema $ quote $ Fn Dynamic (& Dynamic) (-> JsObject) (:features :js-ffi)
         'props-equal $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn props-equal (prev next)
             let
@@ -416,7 +423,13 @@
           :code $ quote $ defn re-memo (c)
             js-ffi.contract/expect-object |React.re-memo $ React/memo c props-equal
           :examples $ []
-          :schema $ quote $ Fn Fn (-> JsObject) (:features :js-ffi)
+          :schema $ quote $ Fn
+            Fn (JsNullish JsObject)
+              & $ JsNullish JsObject
+              -> R
+            -> JsObject
+            :generics R
+            :features :js-ffi
         'render! $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn render! (target el) (ReactDOM/render el target) &unit
           :examples $ []
@@ -424,16 +437,16 @@
         'span $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn span (props & children) (create-element |span props children)
           :examples $ []
-          :schema $ quote $ Fn Dynamic & Dynamic (-> JsObject) (:features :js-ffi)
+          :schema $ quote $ Fn Dynamic (& Dynamic) (-> JsObject) (:features :js-ffi)
         'tag* $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn tag* (name props & children)
             create-element (reacher.util.str/scalar-string name) props children
           :examples $ []
-          :schema $ quote $ Fn Dynamic Dynamic & Dynamic (-> JsObject) (:features :js-ffi)
+          :schema $ quote $ Fn Dynamic Dynamic (& Dynamic) (-> JsObject) (:features :js-ffi)
         'textarea $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn textarea (props & children) (create-element |textarea props children)
           :examples $ []
-          :schema $ quote $ Fn Dynamic & Dynamic (-> JsObject) (:features :js-ffi)
+          :schema $ quote $ Fn Dynamic (& Dynamic) (-> JsObject) (:features :js-ffi)
         'transform-props $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn transform-props (props)
             js-ffi.contract/expect-object |React.transform-props $ if (nil? props) (&js-object)
@@ -474,10 +487,17 @@
         'use-dispatch $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn use-dispatch ()
             let
-                value $ React/useContext context-of-dispatch
-              if (fn? value) value $ raise "|React dispatch context expects a function"
+                dispatch $ React/useContext context-of-dispatch
+              if (fn? dispatch)
+                fn (op)
+                  hint-fn $ Fn *dispatch-op $ -> Unit
+                  dispatch op
+                  , &unit
+                raise "|React dispatch context expects a function"
           :examples $ []
-          :schema $ quote $ Fn (-> Fn) (:features :js-ffi)
+          :schema $ quote $ Fn
+            -> $ Fn *dispatch-op $ -> Unit
+            :features :js-ffi
         'use-effect! $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn use-effect! (params f)
             React/useEffect f $ to-js-data params
@@ -491,7 +511,7 @@
           :code $ quote $ defn wrap-comp (f props & children)
             js-ffi.contract/expect-object |React.wrap-comp $ React/createElement f props & children
           :examples $ []
-          :schema $ quote $ Fn Dynamic Dynamic & Dynamic (-> JsObject) (:features :js-ffi)
+          :schema $ quote $ Fn Dynamic Dynamic (& Dynamic) (-> JsObject) (:features :js-ffi)
       :ns $ %{} 'NsEntry (:doc |)
         :code $ quote $ ns reacher.core
           :require (|react :as React) (|react-dom :as ReactDOM)
@@ -505,7 +525,7 @@
                 target $ contract/expect-object |event.target $ contract/object-field |event event |target
               contract/expect-string |event.target.value $ contract/object-field |event.target target |value
           :examples $ []
-          :schema $ quote $ Fn Dynamic (-> String) (:features :js-ffi)
+          :schema $ quote $ Fn JsObject (-> String) (:features :js-ffi)
         'read-store-prop $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn read-store-prop (props)
             let
@@ -596,7 +616,7 @@
               (:ok scalar) (scalar-text scalar)
               (:err _) (raise "|expected scalar text")
           :examples $ []
-          :schema $ quote $ Fn Dynamic (-> String)
+          :schema $ quote $ Fn T (-> String) (:generics T)
         'scalar-text $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn scalar-text (value)
             match value

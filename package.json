@@ -1,6 +1,6 @@
 {
   "dependencies": {
-    "@calcit/procs": "0.35.1",
+    "@calcit/procs": "0.37.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },
@@ -16,5 +16,5 @@
     "release": "yarn build",
     "test:ffi": "calcit calcit.cirru js && node tests/ffi-contracts.mjs"
   },
-  "version": "0.0.8"
+  "version": "0.0.9"
 }
