@@ -8,6 +8,8 @@ Demo https://repo.calcit-lang.org/reacher/ .
 
 React 元素的子节点列表和 `use-effect!` 的依赖列表保留调用方的元素类型。列表传给 React 时沿用原有转换。
 
+DOM 元素辅助函数的 props 接受 Tag 键的 Map 或空值。`tag*` 的标签名使用已有的 `TextScalar` union，支持 Tag、字符串等可转换为标签文本的标量。子节点仍可混用文本、数字和 React 元素。
+
 `map-strip-keyword` 接受 Tag 与字符串组成的混合列表，按原顺序返回字符串。直接从 JS 调用的代码也应只传这两种元素。React props 和旧存档继续在入口检查。使用 `use-dispatch` 的项目需把 entry 的 `:dispatch-op` 绑定到应用的具名操作类型，Provider 和调用方共用该类型。返回的单参数回调转发操作并返回 Unit，每次调用 hook 可返回新的回调引用。
 
 如果存档读取、解析或 Store 校验失败，页面通过 `hud!` 显示错误并中止启动，

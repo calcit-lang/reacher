@@ -1,7 +1,8 @@
 import assert from "node:assert/strict";
+import { renderToStaticMarkup } from "react-dom/server";
 
 import * as calcit from "../js-out/calcit.core.mjs";
-import { map_strip_keyword } from "../js-out/reacher.core.mjs";
+import { div, map_strip_keyword, tag_$s_ } from "../js-out/reacher.core.mjs";
 import { Store, Task, decode_store } from "../js-out/reacher.app.schema.mjs";
 import {
   read_input_value,
@@ -15,6 +16,10 @@ assert.deepEqual(
   ["id", "名称", "id"],
 );
 assert.deepEqual(calcit.to_js_data(map_strip_keyword(calcit._$L_())), []);
+assert.equal(
+  renderToStaticMarkup(div(null, "prefix ", tag_$s_(calcit.to_tag("span"), calcit._$n__$M_(tags.id, "child"), 42))),
+  '<div>prefix <span id="child">42</span></div>',
+);
 
 const task = calcit._$n__PCT__$M_(
   Task,

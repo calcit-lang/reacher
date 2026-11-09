@@ -347,15 +347,27 @@
         'a $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn a (props & children) (create-element |a props children)
           :examples $ []
-          :schema $ quote $ Fn Dynamic (& Dynamic) (-> JsObject) (:features :js-ffi)
+          :schema $ quote $ Fn
+            JsNullish $ Map Tag Dynamic
+            & Dynamic
+            -> JsObject
+            :features :js-ffi
         'button $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn button (props & children) (create-element |button props children)
           :examples $ []
-          :schema $ quote $ Fn Dynamic (& Dynamic) (-> JsObject) (:features :js-ffi)
+          :schema $ quote $ Fn
+            JsNullish $ Map Tag Dynamic
+            & Dynamic
+            -> JsObject
+            :features :js-ffi
         'canvas $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn canvas (props & children) (create-element |div props children)
           :examples $ []
-          :schema $ quote $ Fn Dynamic (& Dynamic) (-> JsObject) (:features :js-ffi)
+          :schema $ quote $ Fn
+            JsNullish $ Map Tag Dynamic
+            & Dynamic
+            -> JsObject
+            :features :js-ffi
         'context-of-dispatch $ %{} 'CodeEntry (:doc |)
           :code $ quote $ def context-of-dispatch (create-dispatch-context)
           :examples $ []
@@ -369,7 +381,12 @@
           :code $ quote $ defn create-element (tag props children)
             js-ffi.contract/expect-object |React.create-element $ React/createElement (reacher.util.str/scalar-string tag) (transform-props props) & children
           :examples $ []
-          :schema $ quote $ Fn Dynamic Dynamic (List Child) (-> JsObject) (:generics Child) (:features :js-ffi)
+          :schema $ quote $ Fn reacher.util.str/TextScalar
+            JsNullish $ Map Tag Dynamic
+            List Child
+            -> JsObject
+            :generics Child
+            :features :js-ffi
         'dispatch-provider $ %{} 'CodeEntry (:doc |)
           :code $ quote $ def dispatch-provider
             contract/expect-object |React.Context.Provider $ contract/object-field |React.Context context-of-dispatch |Provider
@@ -378,15 +395,27 @@
         'div $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn div (props & children) (create-element |div props children)
           :examples $ []
-          :schema $ quote $ Fn Dynamic (& Dynamic) (-> JsObject) (:features :js-ffi)
+          :schema $ quote $ Fn
+            JsNullish $ Map Tag Dynamic
+            & Dynamic
+            -> JsObject
+            :features :js-ffi
         'img $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn img (props & children) (create-element |img props children)
           :examples $ []
-          :schema $ quote $ Fn Dynamic (& Dynamic) (-> JsObject) (:features :js-ffi)
+          :schema $ quote $ Fn
+            JsNullish $ Map Tag Dynamic
+            & Dynamic
+            -> JsObject
+            :features :js-ffi
         'input $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn input (props & children) (create-element |input props children)
           :examples $ []
-          :schema $ quote $ Fn Dynamic (& Dynamic) (-> JsObject) (:features :js-ffi)
+          :schema $ quote $ Fn
+            JsNullish $ Map Tag Dynamic
+            & Dynamic
+            -> JsObject
+            :features :js-ffi
         'map-strip-keyword $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn map-strip-keyword (xs)
             .map xs $ fn (x)
@@ -405,7 +434,11 @@
         'pre $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn pre (props & children) (create-element |pre props children)
           :examples $ []
-          :schema $ quote $ Fn Dynamic (& Dynamic) (-> JsObject) (:features :js-ffi)
+          :schema $ quote $ Fn
+            JsNullish $ Map Tag Dynamic
+            & Dynamic
+            -> JsObject
+            :features :js-ffi
         'props-equal $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn props-equal (prev next)
             let
@@ -437,42 +470,58 @@
         'span $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn span (props & children) (create-element |span props children)
           :examples $ []
-          :schema $ quote $ Fn Dynamic (& Dynamic) (-> JsObject) (:features :js-ffi)
+          :schema $ quote $ Fn
+            JsNullish $ Map Tag Dynamic
+            & Dynamic
+            -> JsObject
+            :features :js-ffi
         'tag* $ %{} 'CodeEntry (:doc |)
-          :code $ quote $ defn tag* (name props & children)
-            create-element (reacher.util.str/scalar-string name) props children
+          :code $ quote $ defn tag* (name props & children) (create-element name props children)
           :examples $ []
-          :schema $ quote $ Fn Dynamic Dynamic (& Dynamic) (-> JsObject) (:features :js-ffi)
+          :schema $ quote $ Fn reacher.util.str/TextScalar
+            JsNullish $ Map Tag Dynamic
+            & Dynamic
+            -> JsObject
+            :features :js-ffi
         'textarea $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn textarea (props & children) (create-element |textarea props children)
           :examples $ []
-          :schema $ quote $ Fn Dynamic (& Dynamic) (-> JsObject) (:features :js-ffi)
+          :schema $ quote $ Fn
+            JsNullish $ Map Tag Dynamic
+            & Dynamic
+            -> JsObject
+            :features :js-ffi
         'transform-props $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn transform-props (props)
-            js-ffi.contract/expect-object |React.transform-props $ if (nil? props) (&js-object)
-              let
-                  typed-props $ decode-map-as props $ Map Tag Dynamic
-                -> typed-props
-                  filter-map-kv $ fn (k v)
-                    hint-fn $ Fn Tag Dynamic $ -> (MapEntryDecision String Dynamic)
-                    if (= :style k)
-                      MapEntryDecision :keep |style $ let
-                          s $ decode-map-as
-                            .unwrap-or (get typed-props :style) ({})
-                            Map Tag Dynamic
-                        if (empty? s) | $ -> s
-                          filter-map-kv $ fn (style-key style-value)
-                            hint-fn $ Fn Tag Dynamic $ -> (MapEntryDecision String String)
-                            let
-                                prop $ dashed->camel $ reacher.util.str/scalar-text style-key
-                              MapEntryDecision :keep prop $ get-style-value style-value prop
-                          to-js-data
-                      MapEntryDecision :keep
-                        dashed->camel $ reacher.util.str/scalar-text k
-                        if (fn? v) v $ reacher.util.str/scalar-string v
-                  to-js-data
+            js-ffi.contract/expect-object |React.transform-props $ match (js-nullish->option props)
+              (:none) (&js-object)
+              (:some raw-props)
+                let
+                    typed-props $ decode-map-as raw-props $ Map Tag Dynamic
+                  -> typed-props
+                    filter-map-kv $ fn (k v)
+                      hint-fn $ Fn Tag Dynamic $ -> (MapEntryDecision String Dynamic)
+                      if (= :style k)
+                        MapEntryDecision :keep |style $ let
+                            s $ decode-map-as
+                              .unwrap-or (get typed-props :style) ({})
+                              Map Tag Dynamic
+                          if (empty? s) | $ -> s
+                            filter-map-kv $ fn (style-key style-value)
+                              hint-fn $ Fn Tag Dynamic $ -> (MapEntryDecision String String)
+                              let
+                                  prop $ dashed->camel $ reacher.util.str/scalar-text style-key
+                                MapEntryDecision :keep prop $ get-style-value style-value prop
+                            to-js-data
+                        MapEntryDecision :keep
+                          dashed->camel $ reacher.util.str/scalar-text k
+                          if (fn? v) v $ reacher.util.str/scalar-string v
+                    to-js-data
           :examples $ []
-          :schema $ quote $ Fn Dynamic (-> JsObject) (:features :js-ffi)
+          :schema $ quote $ Fn
+            JsNullish $ Map Tag Dynamic
+            -> JsObject
+            :features :js-ffi
         'use-atom $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn use-atom (v)
             let
