@@ -244,7 +244,7 @@
                           assert-type
                             let
                                 candidate $ if (struct? data)
-                                  Option :some $ .to-map data
+                                  Option :some $ &struct:to-map data
                                   if (map? data) (Option :some data) (Option :none)
                               match candidate
                                 (:some value)
