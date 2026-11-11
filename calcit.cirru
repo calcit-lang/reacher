@@ -257,6 +257,30 @@
           :schema $ quote $ Fn Input
             -> $ Option Store
             :generics Input
+          :tests $ []
+            %{} 'TestEntry (:name |legacy-map-to-store)
+              :code $ quote $ assert=
+                Some $ Store :tasks $ []
+                  Task :id |fixture :text |draft :time 1 :done? false
+                decode-store $ {} $ :tasks
+                  [] $ {} (:id |fixture) (:text |draft) (:time 1) (:done? false)
+            %{} 'TestEntry (:name |requires-task-list)
+              :code $ quote $ do
+                assert= None $ decode-store $ {}
+                assert= None $ decode-store $ {} (:tasks |invalid)
+            %{} 'TestEntry (:name |rejects-invalid-task-fields)
+              :code $ quote $ let
+                  task $ {} (:id |fixture) (:text |draft) (:time 1) (:done? false)
+                assert= None $ decode-store $ {}
+                  :tasks $ [] $ dissoc task :text
+                assert= None $ decode-store $ {}
+                  :tasks $ [] $ assoc task :id 0
+                assert= None $ decode-store $ {}
+                  :tasks $ [] $ assoc task :text false
+                assert= None $ decode-store $ {}
+                  :tasks $ [] $ assoc task :time |bad
+                assert= None $ decode-store $ {}
+                  :tasks $ [] $ assoc task :done? 0
         'decode-task $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn decode-task (data)
             let
@@ -282,6 +306,10 @@
           :schema $ quote $ Fn Input
             -> $ Option Task
             :generics Input
+          :tests $ [] $ %{} 'TestEntry (:name |accepts-struct-task)
+            :code $ quote $ assert=
+              Some $ Task :id |fixture :text |draft :time 1 :done? false
+              decode-task $ Task :id |fixture :text |draft :time 1 :done? false
       :ns $ %{} 'NsEntry (:doc |)
         :code $ quote $ ns reacher.app.schema
     'reacher.app.updater $ %{} 'FileEntry
