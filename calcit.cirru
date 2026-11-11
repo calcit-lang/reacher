@@ -110,7 +110,7 @@
         'site $ %{} 'CodeEntry (:doc |)
           :code $ quote $ def site (Site :storage-key |workflow)
           :examples $ []
-          :schema $ quote reacher.app.config/Site
+          :schema $ quote Site
       :ns $ %{} 'NsEntry (:doc |)
         :code $ quote $ ns reacher.app.config
     'reacher.app.main $ %{} 'FileEntry
@@ -119,12 +119,12 @@
           :code $ quote $ defref *store
             schema/Store :tasks $ []
           :examples $ []
-          :schema $ quote $ Ref reacher.app.schema/Store
+          :schema $ quote $ Ref schema/Store
         'create-root-host $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn create-root-host (target)
             js-cast (createRoot target) 'reacher.core/ReactRootHost
           :examples $ []
-          :schema $ quote $ Fn js-ffi.browser/DomElementHost (-> reacher.core/ReactRootHost) (:features :js-ffi)
+          :schema $ quote $ Fn browser/DomElementHost (-> reacher.core/ReactRootHost) (:features :js-ffi)
         'dispatch! $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn dispatch! (op)
             when config/dev? $ println |Dispatch: op
@@ -133,7 +133,7 @@
               reset! *store $ updater @*store op (generate-id!) (:timestamp now)
               , &unit
           :examples $ []
-          :schema $ quote $ Fn reacher.app.schema/Op (-> Unit) (:features :js-ffi)
+          :schema $ quote $ Fn schema/Op (-> Unit) (:features :js-ffi)
         'main! $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn main! ()
             println |Running_mode: $ if config/dev? |dev |release
@@ -239,46 +239,49 @@
                 (:some tasks)
                   if (list? tasks)
                     let
-                        decoded-tasks $ .map tasks $ fn (data)
-                          hint-fn $ Fn Dynamic $ -> (Option reacher.app.schema/Task)
-                          assert-type
-                            let
-                                candidate $ if (struct? data)
-                                  Option :some $ &struct:to-map data
-                                  if (map? data) (Option :some data) (Option :none)
-                              match candidate
-                                (:some value)
-                                  .and-then (get value :id)
-                                    fn (id)
-                                      .and-then (get value :time)
-                                        fn (time)
-                                          .and-then (get value :done?)
-                                            fn (done?)
-                                              .and-then (get value :text)
-                                                fn (text)
-                                                  if
-                                                    and (string? id) (number? time) (bool? done?) (string? text)
-                                                    Option :some $ Task :id id :time time :done? done? :text text
-                                                    Option :none
-                                (:none) (Option :none)
-                            Option reacher.app.schema/Task
+                        decoded-tasks $ .map tasks decode-task
                       if
                         every? decoded-tasks $ fn (task)
                           hint-fn $ Fn (Option reacher.app.schema/Task) (-> Bool)
                           .some? task
-                        Option :some $ Store :tasks $ assert-type
+                        Some $ Store :tasks $ assert-type
                           .map decoded-tasks $ fn (task)
                             hint-fn $ Fn (Option reacher.app.schema/Task) (-> reacher.app.schema/Task)
                             .unwrap task
                           List reacher.app.schema/Task
-                        Option :none
-                    Option :none
-                (:none) (Option :none)
-              Option :none
+                        , None
+                    , None
+                (:none) None
+              , None
           :examples $ []
-          :schema $ quote $ Fn Dynamic
-            -> $ Option reacher.app.schema/Store
-            :features :js-ffi
+          :schema $ quote $ Fn Input
+            -> $ Option Store
+            :generics Input
+        'decode-task $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defn decode-task (data)
+            let
+                candidate $ if (struct? data)
+                  Some $ &struct:to-map data
+                  if (map? data) (Some data) None
+              match candidate
+                (:some value)
+                  .and-then (get value :id)
+                    fn (id)
+                      .and-then (get value :time)
+                        fn (time)
+                          .and-then (get value :done?)
+                            fn (done?)
+                              .and-then (get value :text)
+                                fn (text)
+                                  if
+                                    and (string? id) (number? time) (bool? done?) (string? text)
+                                    Some $ Task :id id :time time :done? done? :text text
+                                    , None
+                (:none) None
+          :examples $ []
+          :schema $ quote $ Fn Input
+            -> $ Option Task
+            :generics Input
       :ns $ %{} 'NsEntry (:doc |)
         :code $ quote $ ns reacher.app.schema
     'reacher.app.updater $ %{} 'FileEntry
@@ -424,13 +427,13 @@
                 (Tag k) (to-string k)
                 (String text) text
           :examples $ []
-          :schema $ quote $ Fn (List reacher.core/KeywordOrString)
+          :schema $ quote $ Fn (List KeywordOrString)
             -> $ List String
         'object-keys-host $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn object-keys-host (value)
             js-cast (js/Object.keys value) 'reacher.core/JsKeyArrayHost
           :examples $ []
-          :schema $ quote $ Fn JsObject (-> reacher.core/JsKeyArrayHost) (:features :js-ffi)
+          :schema $ quote $ Fn JsObject (-> JsKeyArrayHost) (:features :js-ffi)
         'pre $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn pre (props & children) (create-element |pre props children)
           :examples $ []
@@ -532,7 +535,7 @@
                   Fn Dynamic $ -> Unit
               StateRef :value state :setter setter
           :examples $ []
-          :schema $ quote $ Fn Dynamic (-> reacher.core/StateRef) (:features :js-ffi)
+          :schema $ quote $ Fn Dynamic (-> StateRef) (:features :js-ffi)
         'use-dispatch $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn use-dispatch ()
             let
@@ -624,7 +627,7 @@
           :code $ quote $ defn create-regex-host (pattern flags)
             js-cast (new js/RegExp pattern flags) 'reacher.util.str/RegexHost
           :examples $ []
-          :schema $ quote $ Fn String String (-> reacher.util.str/RegexHost) (:features :js-ffi)
+          :schema $ quote $ Fn String String (-> RegexHost) (:features :js-ffi)
         'dashed->camel $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn dashed->camel (x)
             contract/expect-string |String.replace $ .!replace x dashed-letter-pattern $ fn (cc pos prop)
@@ -634,7 +637,7 @@
         'dashed-letter-pattern $ %{} 'CodeEntry (:doc |)
           :code $ quote $ def dashed-letter-pattern (create-regex-host |-[a-z] |g)
           :examples $ []
-          :schema $ quote reacher.util.str/RegexHost
+          :schema $ quote RegexHost
         'escape-html $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn escape-html (text)
             let
@@ -659,7 +662,7 @@
           :code $ quote $ def pattern-non-dimension-props
             create-regex-host "|acit|ex(?:s|g|n|p|$)|rph|grid|ows|mnc|ntw|ine[ch]|zoo|^ord|itera" |i
           :examples $ []
-          :schema $ quote reacher.util.str/RegexHost
+          :schema $ quote RegexHost
         'scalar-string $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn scalar-string (value)
             if (nil? value) | $ match (try-decode-map-as value reacher.util.str/TextScalar)
@@ -676,7 +679,7 @@
               (Bool x) (to-string x)
               (Symbol x) (to-string x)
           :examples $ []
-          :schema $ quote $ Fn reacher.util.str/TextScalar (-> String)
+          :schema $ quote $ Fn TextScalar (-> String)
         'style->string $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn style->string (styles)
             -> (&map:to-list styles)
