@@ -42,7 +42,7 @@
                     , |Run
                 =< 8 0
                 div ({}) & $ .map tasks $ fn (task)
-                  hint-fn $ Fn reacher.app.schema/Task $ -> JsObject
+                  hint-fn $ Fn schema/Task $ -> JsObject
                   wrap-comp memod-comp-task $ &js-object :task task :id $ :id task
           :examples $ []
           :schema $ quote $ Fn (JsNullish JsObject)
@@ -242,13 +242,13 @@
                         decoded-tasks $ .map tasks decode-task
                       if
                         every? decoded-tasks $ fn (task)
-                          hint-fn $ Fn (Option reacher.app.schema/Task) (-> Bool)
+                          hint-fn $ Fn (Option Task) (-> Bool)
                           .some? task
                         Some $ Store :tasks $ assert-type
                           .map decoded-tasks $ fn (task)
-                            hint-fn $ Fn (Option reacher.app.schema/Task) (-> reacher.app.schema/Task)
+                            hint-fn $ Fn (Option Task) (-> Task)
                             .unwrap task
-                          List reacher.app.schema/Task
+                          List Task
                         , None
                     , None
                 (:none) None
@@ -348,7 +348,7 @@
               React/createElement |div $ js-object $ |style
                 js-object $ |height h
           :examples $ []
-          :schema $ quote $ Fn Dynamic Dynamic (-> JsObject) (:features :js-ffi)
+          :schema $ quote $ Fn Width (JsNullish SpacerSize) (-> JsObject) (:generics Width) (:features :js-ffi)
         'JsKeyArrayHost $ %{} 'CodeEntry (:doc |)
           :code $ quote $ deftrait JsKeyArrayHost (:length 'Number)
             .includes $ Fn reacher.core/JsKeyArrayHost String $ -> Bool
@@ -370,6 +370,10 @@
           :ffi $ {} (:backend :js) (:kind :external-object) (:target :browser)
             :names $ {} $ :render! |render
           :schema $ quote Trait
+        'SpacerSize $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defunion SpacerSize Number String
+          :examples $ []
+          :schema $ quote UnionDef
         'StateRef $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstruct StateRef (:value Dynamic)
             :setter $ Fn Dynamic $ -> Unit
@@ -450,7 +454,7 @@
         'map-strip-keyword $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn map-strip-keyword (xs)
             .map xs $ fn (x)
-              hint-fn $ Fn reacher.core/KeywordOrString $ -> String
+              hint-fn $ Fn KeywordOrString $ -> String
               match x
                 (Tag k) (to-string k)
                 (String text) text
