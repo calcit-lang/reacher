@@ -592,7 +592,7 @@
           :code $ quote $ defn wrap-comp (f props & children)
             js-ffi.contract/expect-object |React.wrap-comp $ React/createElement f props & children
           :examples $ []
-          :schema $ quote $ Fn Dynamic Dynamic (& Dynamic) (-> JsObject) (:features :js-ffi)
+          :schema $ quote $ Fn Component Props (& Dynamic) (-> JsObject) (:generics Component Props) (:features :js-ffi)
       :ns $ %{} 'NsEntry (:doc |)
         :code $ quote $ ns reacher.core
           :require (|react :as React) (|react-dom :as ReactDOM)
@@ -685,7 +685,7 @@
                 if (pattern-non-dimension-props .test prop) (str x) (str x |px)
               true $ str x
           :examples $ []
-          :schema $ quote $ Fn Dynamic String (-> String) (:features :js-ffi)
+          :schema $ quote $ Fn V String (-> String) (:generics V) (:features :js-ffi)
         'pattern-non-dimension-props $ %{} 'CodeEntry (:doc |)
           :code $ quote $ def pattern-non-dimension-props
             create-regex-host "|acit|ex(?:s|g|n|p|$)|rph|grid|ows|mnc|ntw|ine[ch]|zoo|^ord|itera" |i
