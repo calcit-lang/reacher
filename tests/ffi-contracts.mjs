@@ -69,3 +69,9 @@ assert.equal(calcit.format_cirru_edn(restored), calcit.format_cirru_edn(store));
 assert.equal(calcit.option_$o_none_$q_(decode_store(
   calcit.parse_cirru_edn('{} $ :tasks $ [] $ {} (:id |bad) (:time 0) (:done? false) (:text 42)')
 )), true);
+
+// Reject the entire archive if any task is invalid, even when others can be restored.
+const mixedTasks = calcit.parse_cirru_edn(`{} $ :tasks $ []
+  {} (:id |ok) (:time 0) (:done? false) (:text |demo)
+  {} (:id |bad) (:time 0) (:done? false) (:text 42)`);
+assert.equal(calcit.option_$o_none_$q_(decode_store(mixedTasks)), true);
