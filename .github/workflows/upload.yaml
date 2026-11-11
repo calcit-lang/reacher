@@ -57,6 +57,7 @@ jobs:
         calcit calcit.cirru --check-only --all-defs --warn-dyn-method
         calcit calcit.cirru fix --workflow strict --verify --format json | jq -e 'if .data.workflow.status? == "passed" and .diagnostics? == [] then true else ., false end'
         calcit calcit.cirru docs check-md README.md
+        calcit calcit.cirru test reacher.app.schema --require-match
         yarn test:ffi
 
     - name: Select CDN asset path
