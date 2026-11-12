@@ -81,7 +81,7 @@
           :schema $ quote $ Fn (JsNullish JsObject)
             & $ JsNullish JsObject
             -> JsObject
-            :features :js-ffi
+            :features :io :js-ffi
         'memod-comp-task $ %{} 'CodeEntry (:doc |)
           :code $ quote $ def memod-comp-task (re-memo comp-task)
           :examples $ []
@@ -133,7 +133,7 @@
               reset! *store $ updater @*store op (generate-id!) (:timestamp now)
               , &unit
           :examples $ []
-          :schema $ quote $ Fn schema/Op (-> Unit) (:features :js-ffi)
+          :schema $ quote $ Fn schema/Op (-> Unit) (:features :io :js-ffi :state)
         'main! $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn main! ()
             println |Running_mode: $ if config/dev? |dev |release
@@ -160,7 +160,7 @@
             println |App_started.
             , &unit
           :examples $ []
-          :schema $ quote $ Fn (-> Unit) (:features :js-ffi)
+          :schema $ quote $ Fn (-> Unit) (:features :io :js-ffi :state)
         'mount-target $ %{} 'CodeEntry (:doc |)
           :code $ quote $ def mount-target
             create-root-host $ .unwrap $ browser/query-selector |.app
@@ -170,7 +170,7 @@
           :code $ quote $ defn persist-storage! ()
             browser/storage-set! (:storage-key config/site) (format-cirru-edn @*store)
           :examples $ []
-          :schema $ quote $ Fn (-> Unit) (:features :js-ffi)
+          :schema $ quote $ Fn (-> Unit) (:features :js-ffi :state)
         'reload! $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn reload! ()
             if (nil? build-errors)
@@ -181,7 +181,7 @@
               hud! |error build-errors
             , &unit
           :examples $ []
-          :schema $ quote $ Fn (-> Unit) (:features :js-ffi)
+          :schema $ quote $ Fn (-> Unit) (:features :io :js-ffi :state)
         'render-app! $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn render-app! ()
             mount-target .render! $ wrap-comp dispatch-provider
@@ -189,7 +189,7 @@
               wrap-comp comp-container $ js-object $ :store @*store
             , &unit
           :examples $ []
-          :schema $ quote $ Fn (-> Unit) (:features :js-ffi)
+          :schema $ quote $ Fn (-> Unit) (:features :io :js-ffi :state)
         'repeat! $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn repeat! (duration cb)
             js/setTimeout
@@ -383,25 +383,28 @@
           :code $ quote $ defn a (props & children) (create-element |a props children)
           :examples $ []
           :schema $ quote $ Fn
-            JsNullish $ Map Tag Dynamic
+            JsNullish $ Map Tag P
             & Dynamic
             -> JsObject
+            :generics P
             :features :js-ffi
         'button $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn button (props & children) (create-element |button props children)
           :examples $ []
           :schema $ quote $ Fn
-            JsNullish $ Map Tag Dynamic
+            JsNullish $ Map Tag P
             & Dynamic
             -> JsObject
+            :generics P
             :features :js-ffi
         'canvas $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn canvas (props & children) (create-element |div props children)
           :examples $ []
           :schema $ quote $ Fn
-            JsNullish $ Map Tag Dynamic
+            JsNullish $ Map Tag P
             & Dynamic
             -> JsObject
+            :generics P
             :features :js-ffi
         'context-of-dispatch $ %{} 'CodeEntry (:doc |)
           :code $ quote $ def context-of-dispatch (create-dispatch-context)
@@ -411,16 +414,16 @@
           :code $ quote $ defn create-dispatch-context ()
             contract/expect-object |React.createContext $ React/createContext $ fn (op) (println |missing_dispatch_function op)
           :examples $ []
-          :schema $ quote $ Fn (-> JsObject) (:features :js-ffi)
+          :schema $ quote $ Fn (-> JsObject) (:features :io :js-ffi)
         'create-element $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn create-element (tag props children)
             js-ffi.contract/expect-object |React.create-element $ React/createElement (reacher.util.str/scalar-string tag) (transform-props props) & children
           :examples $ []
           :schema $ quote $ Fn reacher.util.str/TextScalar
-            JsNullish $ Map Tag Dynamic
+            JsNullish $ Map Tag P
             List Child
             -> JsObject
-            :generics Child
+            :generics P Child
             :features :js-ffi
         'dispatch-provider $ %{} 'CodeEntry (:doc |)
           :code $ quote $ def dispatch-provider
@@ -431,25 +434,28 @@
           :code $ quote $ defn div (props & children) (create-element |div props children)
           :examples $ []
           :schema $ quote $ Fn
-            JsNullish $ Map Tag Dynamic
+            JsNullish $ Map Tag P
             & Dynamic
             -> JsObject
+            :generics P
             :features :js-ffi
         'img $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn img (props & children) (create-element |img props children)
           :examples $ []
           :schema $ quote $ Fn
-            JsNullish $ Map Tag Dynamic
+            JsNullish $ Map Tag P
             & Dynamic
             -> JsObject
+            :generics P
             :features :js-ffi
         'input $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn input (props & children) (create-element |input props children)
           :examples $ []
           :schema $ quote $ Fn
-            JsNullish $ Map Tag Dynamic
+            JsNullish $ Map Tag P
             & Dynamic
             -> JsObject
+            :generics P
             :features :js-ffi
         'map-strip-keyword $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn map-strip-keyword (xs)
@@ -470,9 +476,10 @@
           :code $ quote $ defn pre (props & children) (create-element |pre props children)
           :examples $ []
           :schema $ quote $ Fn
-            JsNullish $ Map Tag Dynamic
+            JsNullish $ Map Tag P
             & Dynamic
             -> JsObject
+            :generics P
             :features :js-ffi
         'props-equal $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn props-equal (prev next)
@@ -506,25 +513,28 @@
           :code $ quote $ defn span (props & children) (create-element |span props children)
           :examples $ []
           :schema $ quote $ Fn
-            JsNullish $ Map Tag Dynamic
+            JsNullish $ Map Tag P
             & Dynamic
             -> JsObject
+            :generics P
             :features :js-ffi
         'tag* $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn tag* (name props & children) (create-element name props children)
           :examples $ []
           :schema $ quote $ Fn reacher.util.str/TextScalar
-            JsNullish $ Map Tag Dynamic
+            JsNullish $ Map Tag P
             & Dynamic
             -> JsObject
+            :generics P
             :features :js-ffi
         'textarea $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn textarea (props & children) (create-element |textarea props children)
           :examples $ []
           :schema $ quote $ Fn
-            JsNullish $ Map Tag Dynamic
+            JsNullish $ Map Tag P
             & Dynamic
             -> JsObject
+            :generics P
             :features :js-ffi
         'transform-props $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn transform-props (props)
@@ -554,8 +564,9 @@
                     to-js-data
           :examples $ []
           :schema $ quote $ Fn
-            JsNullish $ Map Tag Dynamic
+            JsNullish $ Map Tag P
             -> JsObject
+            :generics P
             :features :js-ffi
         'use-atom $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn use-atom (v)
