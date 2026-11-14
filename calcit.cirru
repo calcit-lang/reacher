@@ -578,7 +578,7 @@
                   Fn Dynamic $ -> Unit
               StateRef :value state :setter setter
           :examples $ []
-          :schema $ quote $ Fn Dynamic (-> StateRef) (:features :js-ffi)
+          :schema $ quote $ Fn Initial (-> StateRef) (:generics Initial) (:features :js-ffi)
         'use-dispatch $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn use-dispatch ()
             let
