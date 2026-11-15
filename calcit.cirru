@@ -502,6 +502,7 @@
             Fn (JsNullish JsObject)
               & $ JsNullish JsObject
               -> R
+              :features :io
             -> JsObject
             :generics R
             :features :js-ffi
