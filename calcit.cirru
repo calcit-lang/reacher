@@ -398,7 +398,7 @@
             :generics P
             :features :js-ffi
         'canvas $ %{} 'CodeEntry (:doc |)
-          :code $ quote $ defn canvas (props & children) (create-element |div props children)
+          :code $ quote $ defn canvas (props & children) (create-element |canvas props children)
           :examples $ []
           :schema $ quote $ Fn
             JsNullish $ Map Tag P

@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { renderToStaticMarkup } from "react-dom/server";
 
 import * as calcit from "../js-out/calcit.core.mjs";
-import { _$e__LT_ as spacer, div, map_strip_keyword, tag_$s_ } from "../js-out/reacher.core.mjs";
+import { _$e__LT_ as spacer, canvas, div, map_strip_keyword, tag_$s_ } from "../js-out/reacher.core.mjs";
 import { Store, Task, decode_store } from "../js-out/reacher.app.schema.mjs";
 import {
   read_input_value,
@@ -14,6 +14,7 @@ const tags = calcit.init_tags(["tasks", "id", "time", "done?", "text"]);
 assert.equal(renderToStaticMarkup(spacer(8, 12)), '<div style="width:8px"></div>');
 assert.equal(renderToStaticMarkup(spacer(null, "1em")), '<div style="height:1em"></div>');
 assert.equal(renderToStaticMarkup(spacer(null, null)), "<div></div>");
+assert.equal(renderToStaticMarkup(canvas(calcit._$n__$M_(calcit.to_tag("width"), 120))), '<canvas width="120"></canvas>');
 assert.deepEqual(
   calcit.to_js_data(map_strip_keyword(calcit._$L_(tags.id, "名称", tags.id))),
   ["id", "名称", "id"],
