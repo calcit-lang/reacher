@@ -4,7 +4,7 @@ Reacher: React.js in calcit-js
 
 Demo https://repo.calcit-lang.org/reacher/ .
 
-升级到 Calcit 和 `@calcit/procs` **0.44.0** 后，请重新生成前端 JS 并刷新页面。Respo UI 使用同系列正式补丁 0.15.7，基础样式可能变化。
+升级到 Calcit 和 `@calcit/procs` **0.45.0** 后，请重新生成前端 JS 并刷新页面。Respo UI 使用正式版本 0.16.4，基础样式可能变化。
 
 `=<` 的高度参数接受数字、CSS 字符串或空值。宽度为数字时仍优先使用宽度，否则使用高度。
 
