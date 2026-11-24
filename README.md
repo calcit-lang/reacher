@@ -82,7 +82,7 @@ https://github.com/calcit-lang/respo-calcit-workflow
 
 ### Calcit 与 COS/CDN
 
-Calcit 与 JS 运行时使用 0.44.0，模块图使用 Respo UI 0.15.7、Respo 0.19.13、Router 0.12.11 和 JS-FFI 0.2.19。
+Calcit 与 JS 运行时使用 0.45.0，模块图使用 Respo UI 0.16.4、Respo 0.19.17、Router 0.12.16 和 JS-FFI 0.2.23。
 
 文字转换核心使用 `TextScalar`（String、Tag、Number、Bool、Symbol）。开放 props 仍在边界验证，已有 nil 转空文本、样式单位和回调身份行为保持。
 
