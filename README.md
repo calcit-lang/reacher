@@ -4,7 +4,7 @@ Reacher: React.js in calcit-js
 
 Demo https://repo.calcit-lang.org/reacher/ .
 
-候选 Git 版本 0.0.12 使用 Calcit 和 `@calcit/procs` **0.45.1**，升级后请重新安装依赖、生成前端 JS 并刷新页面。Respo UI 使用正式版本 0.16.5，基础样式可能变化。
+候选 Git 版本 0.0.13 使用 Calcit 和 `@calcit/procs` **0.46.0**，升级后请重新安装依赖、生成前端 JS 并刷新页面。Respo UI 仍使用正式版本 0.16.5，依赖图中的 JS-FFI 保持 0.2.24；该组合已通过 Caps 严格解析。Respo 的 0.46 依赖链发布后，仍需继续升级这些模块。基础样式可能变化。
 
 `=<` 的高度参数接受数字、CSS 字符串或空值。宽度为数字时仍优先使用宽度，否则使用高度。
 
