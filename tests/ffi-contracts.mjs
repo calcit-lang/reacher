@@ -79,3 +79,22 @@ const mixedTasks = calcit.parse_cirru_edn(`{} $ :tasks $ []
   {} (:id |ok) (:time 0) (:done? false) (:text |demo)
   {} (:id |bad) (:time 0) (:done? false) (:text 42)`);
 assert.equal(calcit.option_$o_none_$q_(decode_store(mixedTasks)), true);
+
+// A checked state reference decodes React's value and rejects function-valued updates,
+// which React would otherwise interpret as updater callbacks.
+const React = await import("react");
+const { use_checked_atom } = await import("../js-out/reacher.core.mjs");
+let checkedSetter;
+function CheckedStateProbe({ initial, decode }) {
+  const state = use_checked_atom(initial, decode);
+  checkedSetter = state.nthAt(0, calcit.to_tag("setter"));
+  return React.createElement("span", null, state.nthAt(1, calcit.to_tag("value")));
+}
+const textOnly = (value) => {
+  if (typeof value !== "string") throw new Error("expected string state");
+  return value;
+};
+assert.equal(renderToStaticMarkup(React.createElement(CheckedStateProbe, { initial: "状态 🐈", decode: textOnly })), "<span>状态 🐈</span>");
+assert.throws(() => checkedSetter(() => "changed"), /Function-valued-state-is-not-supported/);
+assert.throws(() => renderToStaticMarkup(React.createElement(CheckedStateProbe, { initial: 42, decode: textOnly })), /expected string state/);
+assert.throws(() => renderToStaticMarkup(React.createElement(CheckedStateProbe, { initial: () => "lazy", decode: textOnly })), /Function-valued-state-is-not-supported/);

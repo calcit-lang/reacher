@@ -14,7 +14,7 @@
           :code $ quote $ defn comp-container (props & host-args)
             let
                 store $ ffi/read-store-prop props
-                *draft $ use-atom |
+                *draft $ use-checked-atom | $ fn (raw) (decode-map-as raw String)
                 d! $ use-dispatch
                 tasks $ :tasks store
               div
@@ -35,7 +35,7 @@
                   button
                     {} (:style ui/button)
                       :on-click $ fn (event)
-                        d! $ schema/Op :add-task $ decode-map-as (:value *draft) 'String
+                        d! $ schema/Op :add-task $ :value *draft
                         let
                             setter $ :setter *draft
                           setter |
@@ -91,7 +91,7 @@
           :require (respo-ui.core :as ui)
             respo-ui.core :refer $ hsl
             reacher.app.config :refer $ dev?
-            reacher.core :refer $ defcomp div =< textarea span input button use-atom use-dispatch use-effect! re-memo wrap-comp
+            reacher.core :refer $ defcomp div =< textarea span input button use-checked-atom use-dispatch use-effect! re-memo wrap-comp
             |react :as React
             js-ffi.browser :as browser
             reacher.ffi :as ffi
@@ -349,6 +349,11 @@
                 js-object $ |height h
           :examples $ []
           :schema $ quote $ Fn Width (JsNullish SpacerSize) (-> JsObject) (:generics Width) (:features :js-ffi)
+        'CheckedStateRef $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstruct CheckedStateRef (:generics T) (:value T)
+            :setter $ Fn T $ -> Unit
+          :examples $ []
+          :schema $ quote StructDef
         'JsKeyArrayHost $ %{} 'CodeEntry (:doc |)
           :code $ quote $ deftrait JsKeyArrayHost (:length 'Number)
             .includes $ Fn reacher.core/JsKeyArrayHost String $ -> Bool
@@ -580,6 +585,25 @@
               StateRef :value state :setter setter
           :examples $ []
           :schema $ quote $ Fn Initial (-> StateRef) (:generics Initial) (:features :js-ffi)
+        'use-checked-atom $ %{} 'CodeEntry
+          :doc "|Decode the React value into T and expose a setter for ordinary T values. Function-valued initial values and updates are rejected because React treats them as lazy initializers and updater functions."
+          :code $ quote $ defn use-checked-atom (initial decode)
+            when (fn? initial) (raise |Function-valued-state-is-not-supported)
+            let
+                state-ref $ use-atom initial
+                value $ decode $ :value state-ref
+                raw-setter $ :setter state-ref
+              CheckedStateRef :value value :setter $ fn (next)
+                hint-fn $ Fn T $ -> Unit
+                when (fn? next) (raise |Function-valued-state-is-not-supported)
+                raw-setter next
+                , &unit
+          :examples $ []
+          :schema $ quote $ Fn T
+            Fn Dynamic $ -> T
+            -> $ CheckedStateRef T
+            :generics T
+            :features :js-ffi
         'use-dispatch $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn use-dispatch ()
             let
