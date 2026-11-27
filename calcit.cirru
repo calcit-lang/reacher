@@ -490,7 +490,7 @@
                 = (p-fields :length) (n-fields :length)
                 p-fields .every $ fn (k idx parent)
                   and (n-fields .includes k)
-                    = (aget prev k) (aget next k)
+                    &= (aget prev k) (aget next k)
                 , false
           :examples $ []
           :schema $ quote $ Fn JsObject JsObject (-> Bool) (:features :js-ffi)
